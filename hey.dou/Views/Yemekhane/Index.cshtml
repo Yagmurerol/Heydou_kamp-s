@@ -1,0 +1,42 @@
+﻿@model List<HeyDOU.KampusApp.Models.YemekhaneMenu>
+
+@{
+    ViewData["Title"] = "Güncel Yemekhane Menüleri";
+}
+
+<h2>@ViewData["Title"]</h2>
+<hr />
+
+<p>
+    <a asp-action="MenuEkle" class="btn btn-success">Yeni Menü Ekle</a>
+</p>
+
+@* Listeyi Bootstrap kartları ile gösterir *@
+<div class="row">
+    @if (Model != null && Model.Any())
+    {
+        @foreach (var menu in Model)
+        {
+            <div class="col-md-4 mb-4">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-info text-white">
+                        @menu.Tarih.ToShortDateString()
+                    </div>
+                    <div class="card-body">
+                        <p class="card-text">@Html.Raw(menu.MenuIcerigi.Replace("\n", "<br />"))</p>
+                        @if (!string.IsNullOrEmpty(menu.Notlar))
+                        {
+                            <small class="text-muted">Not: @menu.Notlar</small>
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+    }
+    else
+    {
+        <div class="col-12">
+            <div class="alert alert-warning">Yayınlanmış menü bulunmamaktadır.</div>
+        </div>
+    }
+</div>
