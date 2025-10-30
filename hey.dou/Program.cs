@@ -29,4 +29,9 @@ app.UseHttpsRedirection();
 
 app.UseAuthorization();
 
+// ----- ÇAKIÞMA BURADAYDI - DÜZELTÝLDÝ -----
+// API Controller'larýný eþleþtirmek için bu gereklidir
 app.MapControllers();
+
+// 'app.Run()' komutu en sonda olmalý
+app.Run();
