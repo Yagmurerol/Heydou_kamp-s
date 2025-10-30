@@ -1,23 +1,27 @@
+// Dosya: Models/YemekhaneMenu.cs
+// 'Namespace' HATASINI GÝDERMEK ÝÇÝN DÜZELTÝLMÝÞ KOD
+
+using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace HeyDOU.KampusApp.Models // Namespace'inizi kontrol edin
+// HATA BURADAYDI: Namespace'iniz tam olarak bu satýrdaki gibi olmalý
+namespace HeyDOU.KampusApp.Models
 {
     public class YemekhaneMenu
     {
-        public int Id { get; set; }
+        public int Id { get; set; } // Veritabaný için birincil anahtar (Primary Key)
 
-        [Required(ErrorMessage = "Tarih alaný zorunludur.")]
-        [DataType(DataType.Date)]
         [Display(Name = "Menü Tarihi")]
+        [DataType(DataType.Date)]
         public DateTime Tarih { get; set; }
 
-        [Required(ErrorMessage = "Menü içeriði zorunludur.")]
-        [StringLength(1000)]
+        // 'Non-nullable' hatasý için düzeltme (Boþ olamaz)
         [Display(Name = "Menü Ýçeriði")]
-        public string MenuIcerigi { get; set; }
+        [Required(ErrorMessage = "Menü içeriði boþ býrakýlamaz.")]
+        public string MenuIcerigi { get; set; } = string.Empty;
 
-        [StringLength(250)]
+        // 'Non-nullable' hatasý için düzeltme (Boþ olabilir)
         [Display(Name = "Notlar")]
-        public string Notlar { get; set; }
+        public string? Notlar { get; set; }
     }
 }
