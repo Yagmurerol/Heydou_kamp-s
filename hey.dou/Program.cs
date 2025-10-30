@@ -1,27 +1,37 @@
+using Microsoft.EntityFrameworkCore;
+using hey.dou.Models; // Model klasörünüzün yolu
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-builder.Services.AddControllersWithViews();
+// 1. Connection string'i appsettings.json'dan al
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+
+// 2. DbContext'i servislere ekle
+// (HeydouContext adýnýn doðru olduðunu varsayýyoruz)
+builder.Services.AddDbContext<HeydouContext>(options =>
+	options.UseSqlServer(connectionString));
+
+// 3. Controller'larý ve Swagger'ý ekle
+builder.Services.AddControllers();
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (!app.Environment.IsDevelopment())
+if (app.Environment.IsDevelopment())
 {
-    app.UseExceptionHandler("/Home/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-    app.UseHsts();
+	app.UseSwagger();
+	app.UseSwaggerUI();
 }
 
 app.UseHttpsRedirection();
-app.UseStaticFiles();
-
-app.UseRouting();
 
 app.UseAuthorization();
 
-app.MapControllerRoute(
-    name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
+// ----- ÇAKIÞMA BURADAYDI - DÜZELTÝLDÝ -----
+// API Controller'larýný eþleþtirmek için bu gereklidir
+app.MapControllers();
 
+// 'app.Run()' komutu en sonda olmalý
 app.Run();
