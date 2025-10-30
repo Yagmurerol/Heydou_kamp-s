@@ -1,27 +1,42 @@
+// Gerekli using ifadelerini en üste ekleyin
+using Microsoft.EntityFrameworkCore;
+// HATA 1: Proje adýnýz 'hey.dou' olduðu için burasý 'hey.dou.Models' olmalý.
+using hey.dou.Models;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-builder.Services.AddControllersWithViews();
+// ----- BURAYI EKLÝYORSUNUZ -----
+// 1. Connection string'i appsettings.json'dan al
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+
+// 2. DbContext'i servislere ekle (Dependency Injection)
+// 'HeydouContext' adýnýn Models klasörünüzdeki ...Context.cs dosya adýyla
+// ayný olduðundan emin olun.
+builder.Services.AddDbContext<HeydouContext>(options =>
+	options.UseSqlServer(connectionString));
+
+// 3. Controller'larý ekle
+builder.Services.AddControllers();
+// ---------------------------------
+
+// (Swagger/OpenAPI için olan kodlar zaten burada vardýr, onlara dokunmayýn)
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (!app.Environment.IsDevelopment())
+// (Kalan kodlara dokunmayýn...)
+if (app.Environment.IsDevelopment())
 {
-    app.UseExceptionHandler("/Home/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-    app.UseHsts();
+	app.UseSwagger();
+	app.UseSwaggerUI();
 }
 
 app.UseHttpsRedirection();
-app.UseStaticFiles();
-
-app.UseRouting();
-
 app.UseAuthorization();
-
-app.MapControllerRoute(
-    name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
-
+app.MapControllers();
 app.Run();
+
+// HATA 2: Buraya JSON KODU YAPIÞTIRILMAZ.
+// O kod 'appsettings.json' dosyasýna aittir.
+// O yüzden buraya yapýþtýrdýðýnýz { "Logging": ... } bloðunu sildim.
