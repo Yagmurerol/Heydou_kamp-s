@@ -1,5 +1,4 @@
-﻿
-@model List<AkademikEtkinlik>
+﻿@model List<hey.dou.Models.AkademikTakvim>
 @{
     ViewData["Title"] = "Akademik Takvim";
 }
@@ -84,13 +83,13 @@
                             
                             <div class="space-y-3 pt-2">
                                 
-                                @foreach (var etkinlik in Model)
+                                @foreach (var takvim in Model)
                                 {
                                     <div class="flex items-start gap-3 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800/50">
-                                        <div class="size-4 mt-1 rounded-full" style="background-color: @etkinlik.RenkKodu"></div>
+                                        <div class="size-4 mt-1 rounded-full" style="background-color: @takvim.RenkKodu"></div>
                                         <div>
-                                            <p class="font-semibold">@etkinlik.Baslik</p>
-                                            <p class="text-sm text-[#617589] dark:text-[#a6b3c1]">@etkinlik.Aciklama</p>
+                                            <p class="font-semibold">@takvim.Kategori</p>
+                                            <p class="text-sm text-[#617589] dark:text-[#a6b3c1]">@takvim.Aciklama</p>
                                         </div>
                                     </div>
                                 }

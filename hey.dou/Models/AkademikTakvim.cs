@@ -14,4 +14,5 @@ public partial class AkademikTakvim
     public string Aciklama { get; set; } = null!;
 
     public string? Kategori { get; set; }
+    public string? RenkKodu { get; set; }
 }

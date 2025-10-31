@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+
 using Microsoft.EntityFrameworkCore;
 using hey.dou.Models; // Proje adınız 'hey.dou' ve modelleriniz 'Models' klasöründe
 using System.Threading.Tasks;
