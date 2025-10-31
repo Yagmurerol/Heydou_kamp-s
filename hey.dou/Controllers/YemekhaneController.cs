@@ -1,15 +1,16 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using hey.dou.Models;
 using HeyDOU.KampusApp.Models;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace HeyDOU.KampusApp.Controllers // Namespace'inizi kontrol edin
 {
     public class YemekhaneController : Controller
     {
-        private readonly ApplicationDbContext _context;
+        private readonly HeydouContext _context;
 
         // DbContext'i buraya enjekte ediyoruz (Program.cs'te tanımladınız).
-        public YemekhaneController(ApplicationDbContext context)
+        public YemekhaneController(HeydouContext context)
         {
             _context = context;
         }
@@ -17,11 +18,8 @@ namespace HeyDOU.KampusApp.Controllers // Namespace'inizi kontrol edin
         // GET: /Yemekhane/Index (Menüleri Listeleme)
         public async Task<IActionResult> Index()
         {
-            var bugun = DateTime.Today;
-            var gelecekMenuler = await _context.YemekhaneMenuleri
-                                               .Where(m => m.Tarih >= bugun)
-                                               .OrderBy(m => m.Tarih)
-                                               .ToListAsync();
+            // Veritabanındaki TÜM menüleri çek (Filtreleme ve sıralama şimdilik kaldırıldı)
+            var gelecekMenuler = await _context.HaftalikMenus.ToListAsync();
             return View(gelecekMenuler);
         }
 
@@ -34,7 +32,7 @@ namespace HeyDOU.KampusApp.Controllers // Namespace'inizi kontrol edin
         // POST: Form Gönderimini İşleme
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> MenuEkle(YemekhaneMenu menu)
+        public async Task<IActionResult> MenuEkle(HaftalikMenu menu)
         {
             if (ModelState.IsValid)
             {

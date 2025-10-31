@@ -1,42 +1,84 @@
-﻿@model List<HeyDOU.KampusApp.Models.YemekhaneMenu>
-
+﻿@model List<hey.dou.Models.HaftalikMenu>
 @{
-    ViewData["Title"] = "Güncel Yemekhane Menüleri";
+    ViewData["Title"] = "Yemekhane Menüsü";
 }
 
-<h2>@ViewData["Title"]</h2>
-<hr />
+<body class="bg-background-light dark:bg-background-dark font-display text-text-light dark:text-text-dark">
+    <div class="relative flex h-auto min-h-screen w-full flex-col group/design-root overflow-x-hidden">
+        <div class="layout-container flex h-full grow flex-col">
 
-<p>
-    <a asp-action="MenuEkle" class="btn btn-success">Yeni Menü Ekle</a>
-</p>
-
-@* Listeyi Bootstrap kartları ile gösterir *@
-<div class="row">
-    @if (Model != null && Model.Any())
-    {
-        @foreach (var menu in Model)
-        {
-            <div class="col-md-4 mb-4">
-                <div class="card shadow-sm">
-                    <div class="card-header bg-info text-white">
-                        @menu.Tarih.ToShortDateString()
+            <header class="flex items-center justify-between ... px-4 sm:px-10 lg:px-40 py-4 ...">
+                <div class="flex items-center gap-8">
+                    <a class="flex items-center gap-3 ..." href="#">
+                        <div class="flex h-12 w-12 items-center justify-center rounded-full bg-primary text-white shadow-md">
+                            <span class="material-symbols-outlined text-3xl"> restaurant_menu </span>
+                        </div>
+                        <h1 class="text-gray-800 dark:text-white text-xl font-bold ...">Lezzet Durağı</h1>
+                    </a>
+                </div>
+                <div class="flex flex-1 justify-end gap-2 sm:gap-4 items-center">
+                    <nav class="hidden md:flex items-center gap-8">
+                        <a ... href="#">Ana Sayfa</a>
+                        <a ... href="#">Hakkımızda</a>
+                        <a class="text-primary ... " href="#">Yemekhane</a>
+                        <a ... href="#">İletişim</a>
+                    </nav>
+                    <button class="p-2 ... md:hidden">
+                        <span class="material-symbols-outlined">menu</span>
+                    </button>
+                    <button class="hidden sm:flex ...">
+                        <span class="truncate">Veli Portalı</span>
+                    </button>
+                </div>
+            </header>
+            <main class="px-4 sm:px-10 lg:px-40 py-8 flex flex-1 justify-center">
+                <div class="layout-content-container flex flex-col w-full">
+                    <div class="flex flex-col items-center text-center gap-4 p-4 mb-8 relative">
+                        <h2 class="... text-5xl font-black ...">Haftanın Lezzetleri</h2>
+                        <p class="... text-lg ...">Öğrencilerimiz için sevgiyle hazırladığımız, besleyici ve lezzetli yemeklerle dolu bir haftaya merhaba deyin!</p>
                     </div>
-                    <div class="card-body">
-                        <p class="card-text">@Html.Raw(menu.MenuIcerigi.Replace("\n", "<br />"))</p>
-                        @if (!string.IsNullOrEmpty(menu.Notlar))
-                        {
-                            <small class="text-muted">Not: @menu.Notlar</small>
-                        }
+                    <div class="flex ... justify-between items-center ... mb-10 bg-card-light ...">
+                        <div class="flex items-center justify-center gap-3">
+                            <button ...><span class="material-symbols-outlined">chevron_left</span></button>
+                            <h3 class="... text-xl font-bold ...">21 - 25 Ekim Haftası</h3>
+                            <button ...><span class="material-symbols-outlined">chevron_right</span></button>
+                        </div>
+                        <div class="flex gap-2">
+                            <button ...><span class="material-symbols-outlined ...">download</span><span>İndir</span></button>
+                        </div>
+                    </div>
+
+                    <div class="w-full">
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+                            @foreach (var menu in Model)
+                            {
+                                <div class="bg-card-light dark:bg-card-dark rounded-xl shadow-lg border border-transparent hover:border-primary ... flex flex-col p-6">
+                                    <h3 class="text-2xl font-bold text-primary mb-4 pb-4 border-b border-gray-100 dark:border-gray-700">
+                                        @menu.Gun
+                                    </h3>
+                                    <ul class="space-y-4 text-text-light dark:text-gray-300 text-lg flex-grow">
+                                        <li>@menu.Corba</li>
+                                        <li>@menu.AnaYemek</li>
+                                        <li>@menu.YardimciYemek</li>
+                                        <li>@menu.TatliVeyaMeyve</li>
+                                    </ul>
+                                    <div class="flex items-center gap-3 pt-4 mt-4">
+                                    </div>
+                                </div>
+                            }
+
+                        </div>
                     </div>
                 </div>
-            </div>
-        }
-    }
-    else
-    {
-        <div class="col-12">
-            <div class="alert alert-warning">Yayınlanmış menü bulunmamaktadır.</div>
+            </main>
+
+            <footer class="bg-white dark:bg-card-dark mt-10">
+                <div class="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-40">
+                    ... (Footer içeriği) ...
+                </div>
+            </footer>
+
         </div>
-    }
-</div>
+    </div>
+</body>
