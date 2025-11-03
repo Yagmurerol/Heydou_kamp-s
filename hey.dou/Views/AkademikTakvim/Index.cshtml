@@ -1,81 +1,218 @@
 ﻿@model List<hey.dou.Models.AkademikTakvim>
 @{
     ViewData["Title"] = "Akademik Takvim";
+
+    int currentYear = (int)ViewBag.CurrentYear;
+    int currentMonth = (int)ViewBag.CurrentMonth;
+
+    var today = DateTime.Today;
+    var firstDay = new DateTime(currentYear, currentMonth, 1);
+    var daysInMonth = DateTime.DaysInMonth(currentYear, currentMonth);
+
+    // pazartesiyle başlasın
+    int padding = ((int)firstDay.DayOfWeek + 6) % 7;
+
+    // bu ayın etkinlikleri
+    var monthEvents = Model
+        .Where(e => e.BaslangicTarihi.Year == currentYear &&
+                    e.BaslangicTarihi.Month == currentMonth)
+        .ToList();
+
+    // yaklaşanlar
+    var upcoming = Model
+        .Where(e => e.BaslangicTarihi.ToDateTime(TimeOnly.MinValue) >= DateTime.Today)
+        .OrderBy(e => e.BaslangicTarihi)
+        .Take(5)
+        .ToList();
+
+    string MonthNameTr(int m)
+    {
+        string[] names = { "Ocak", "Şubat", "Mart", "Nisan", "Mayıs", "Haziran", "Temmuz", "Ağustos", "Eylül", "Ekim", "Kasım", "Aralık" };
+        return names[m - 1];
+    }
+
+    // veri tabanında renk varsa onu kullan, yoksa kategoriye göre üret
+    string GetColor(hey.dou.Models.AkademikTakvim ev)
+    {
+        if (!string.IsNullOrWhiteSpace(ev.RenkKodu))
+            return ev.RenkKodu;
+
+        if (!string.IsNullOrWhiteSpace(ev.Kategori))
+        {
+            if (ev.Kategori.Contains("Sınav")) return "#f59e0b";
+            if (ev.Kategori.Contains("Tatil")) return "#10b981";
+            if (ev.Kategori.Contains("Kayıt")) return "#ef4444";
+        }
+        return "#94a3b8";
+    }
+
+    // ok linkleri
+    string prevUrl = Url.Action("Index", "AkademikTakvim", new { year = (int)ViewBag.PrevYear, month = (int)ViewBag.PrevMonth })!;
+    string nextUrl = Url.Action("Index", "AkademikTakvim", new { year = (int)ViewBag.NextYear, month = (int)ViewBag.NextMonth })!;
 }
 
-<body class="bg-background-light dark:bg-background-dark font-display text-[#111418] dark:text-white">
-    <div class="relative flex h-auto min-h-screen w-full flex-col group/design-root overflow-x-hidden">
-        <div class="layout-container flex h-full grow flex-col">
+<body class="bg-background-light dark:bg-background-dark font-display text-[#111418] dark:text-white min-h-screen">
+    <!-- üst bar -->
+    <header class="px-6 sm:px-10 lg:px-20 py-4 flex items-center justify-between">
+        <h1 class="text-xl font-bold tracking-tight">hey.dou</h1>
+    </header>
 
-            <header class="flex items-center justify-between ... px-6 sm:px-10 lg:px-20 py-3">
-            </header>
+    <!-- ana içerik -->
+    <main class="px-6 sm:px-10 lg:px-20 pb-10">
+        <!-- başlık ve yazdır -->
+        <div class="flex items-center justify-between mb-6">
+            <div>
+                <h2 class="text-3xl md:text-4xl font-extrabold">Akademik Takvim</h2>
+                <p class="text-sm text-slate-500 dark:text-slate-300 mt-1">Sınav, tatil ve kayıt dönemlerini buradan takip edebilirsin.</p>
+            </div>
+            <button class="inline-flex items-center gap-2 rounded-lg border border-slate-200 dark:border-slate-700 px-4 py-2 text-sm hover:bg-slate-50 dark:hover:bg-slate-800">
+                <span class="material-symbols-outlined text-base">print</span>
+                Yazdır
+            </button>
+        </div>
 
-            <main class="flex-1 px-6 sm:px-10 lg:px-20 py-8">
-                <div class="max-w-7xl mx-auto">
-                    <div class="flex ... justify-between items-center ... mb-8">
-                        <p class="text-4xl font-black ...">Akademik Takvim</p>
-                        <button class="flex items-center gap-2 ...">
-                            <span class="material-symbols-outlined">print</span>
-                            <span>Yazdır</span>
-                        </button>
-                    </div>
-                    <div class="flex flex-col lg:flex-row gap-8">
-                        <div class="w-full lg:w-1/4 xl:w-1/5 space-y-6">
-                            <div class="bg-white dark:bg-[#1a2835] p-4 rounded-lg shadow">...</div>
-                            <div class="bg-white dark:bg-[#1a2835] p-4 rounded-lg shadow">...</div>
-                        </div>
-
-                        <div class="flex-1 bg-white dark:bg-[#1a2835] p-6 rounded-lg shadow">
-                            <div class="flex items-center justify-between mb-6">...</div>
-                            <div class="grid grid-cols-7 gap-1 text-center">...</div>
-
-                            <div class="mt-8">
-                                <details class="flex flex-col border-t ... py-2 group" open="">
-                                    <summary class="flex ... justify-between gap-6 py-2">
-                                        <p class="text-base font-medium">Yaklaşan Etkinlikler</p>
-                                        <span class="material-symbols-outlined ...">expand_more</span>
-                                    </summary>
-
-                                    <div class="space-y-3 pt-2">
-
-                                        @foreach (var takvim in Model)
-                                        {
-                                            // Kategoriye göre renk belirleme
-                                            string renk = "bg-gray-400"; // Varsayılan renk (boşsa)
-
-                                            // 'Kategori' alanının 'null' veya 'boş' OLMADIĞINI kontrol ediyoruz
-                                            if (!string.IsNullOrEmpty(takvim.Kategori))
-                                            {
-                                                // Artık güvenle .Contains() kullanabiliriz
-                                                if (takvim.Kategori.Contains("Sınav")) { renk = "bg-[#f59e0b]"; }
-                                                else if (takvim.Kategori.Contains("Tatil")) { renk = "bg-[#10b981]"; }
-                                                else if (takvim.Kategori.Contains("Kayıt")) { renk = "bg-[#ef4444]"; }
-                                            }
-
-                                            <div class="flex items-start gap-3 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800/50">
-
-                                                <div class="size-4 mt-1 rounded-full @renk"></div>
-
-                                                <div>
-                                                    <p class="font-semibold">@takvim.Kategori</p>
-
-                                                    <p class="text-sm text-[#617589] dark:text-[#a6b3c1]">@takvim.Aciklama</p>
-                                                </div>
-                                            </div>
-                                        }
-
-                                        @if (!Model.Any())
-                                        {
-                                            <p class="text-sm ...">Gösterilecek yaklaşan etkinlik bulunmamaktadır.</p>
-                                        }
-
-                                    </div>
-                                </details>
-                            </div>
-                        </div>
+        <div class="flex flex-col lg:flex-row gap-6">
+            <!-- SOL PANEL: filtre + renk kodu (eski halin gibi) -->
+            <aside class="w-full lg:w-1/4 xl:w-1/5 space-y-6">
+                <!-- filtre kutusu -->
+                <div class="bg-white dark:bg-[#1a2835] p-4 rounded-lg shadow">
+                    <p class="text-sm font-semibold mb-3">Filtrele</p>
+                    <div class="space-y-2 text-sm">
+                        <label class="flex items-center gap-2">
+                            <input type="radio" name="takvimFilter" checked class="text-primary" />
+                            <span>Tümü</span>
+                        </label>
+                        <label class="flex items-center gap-2">
+                            <input type="radio" name="takvimFilter" class="text-primary" />
+                            <span>Sınavlar</span>
+                        </label>
+                        <label class="flex items-center gap-2">
+                            <input type="radio" name="takvimFilter" class="text-primary" />
+                            <span>Tatiller</span>
+                        </label>
+                        <label class="flex items-center gap-2">
+                            <input type="radio" name="takvimFilter" class="text-primary" />
+                            <span>Kayıt Dönemleri</span>
+                        </label>
                     </div>
                 </div>
-            </main>
+
+                <!-- renk kodu kutusu -->
+                <div class="bg-white dark:bg-[#1a2835] p-4 rounded-lg shadow">
+                    <p class="text-sm font-semibold mb-3">Renk Kodu</p>
+                    <ul class="space-y-2 text-sm">
+                        <li class="flex items-center gap-2">
+                            <span class="h-3 w-3 rounded-full bg-[#f59e0b]"></span>
+                            Sınavlar
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <span class="h-3 w-3 rounded-full bg-[#10b981]"></span>
+                            Tatiller
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <span class="h-3 w-3 rounded-full bg-[#ef4444]"></span>
+                            Kayıt Dönemleri
+                        </li>
+                    </ul>
+                </div>
+            </aside>
+
+            <!-- SAĞ TARAF: takvim + yaklaşan -->
+            <section class="flex-1 space-y-6">
+                <!-- TAKVİM KUTUSU -->
+                <div class="bg-white dark:bg-[#1a2835] p-6 rounded-lg shadow">
+                    <!-- ay başlığı ve oklar -->
+                    <div class="flex items-center justify-between mb-6">
+                        <h3 class="text-lg font-semibold text-[#111418] dark:text-white">
+                            @MonthNameTr(currentMonth) @currentYear
+                        </h3>
+                        <div class="flex gap-2">
+                            <a href="@prevUrl"
+                               class="h-9 w-9 rounded-full bg-slate-100 dark:bg-slate-700 flex items-center justify-center hover:bg-slate-200 dark:hover:bg-slate-600">
+                                <span class="material-symbols-outlined text-sm">chevron_left</span>
+                            </a>
+                            <a href="@nextUrl"
+                               class="h-9 w-9 rounded-full bg-slate-100 dark:bg-slate-700 flex items-center justify-center hover:bg-slate-200 dark:hover:bg-slate-600">
+                                <span class="material-symbols-outlined text-sm">chevron_right</span>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- gün başlıkları -->
+                    <div class="grid grid-cols-7 gap-2 text-center text-xs font-semibold text-slate-400 mb-2">
+                        <div>Pzt</div>
+                        <div>Sal</div>
+                        <div>Çar</div>
+                        <div>Per</div>
+                        <div>Cum</div>
+                        <div>Cmt</div>
+                        <div>Paz</div>
+                    </div>
+
+                    <!-- günler -->
+                    <div class="grid grid-cols-7 gap-2 text-center">
+                        @for (int i = 0; i < padding; i++)
+                        {
+                            <div class="h-16 rounded-xl"></div>
+                        }
+
+                        @for (int day = 1; day <= daysInMonth; day++)
+                        {
+                            var dayDate = new DateOnly(currentYear, currentMonth, day);
+                            var eventsOfDay = monthEvents
+                            .Where(e => e.BaslangicTarihi == dayDate)
+                            .ToList();
+
+                            bool isToday = (day == today.Day && currentMonth == today.Month && currentYear == today.Year);
+
+                            <div class="h-16 rounded-xl border border-slate-100/80 dark:border-slate-700/50 bg-slate-50/40 dark:bg-slate-900/30 flex flex-col items-center py-1 gap-1 @(isToday ? "ring-2 ring-primary/70" : "")">
+                                <span class="text-sm font-semibold @(isToday ? "text-primary" : "text-slate-700 dark:text-slate-50")">
+                                    @day
+                                </span>
+                                <div class="flex gap-1 flex-wrap justify-center">
+                                    @foreach (var ev in eventsOfDay.Take(3))
+                                    {
+                                        var c = GetColor(ev);
+                                        <span class="h-2 w-2 rounded-full" style="background-color:@c"></span>
+                                    }
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                <!-- YAKLAŞAN ETKİNLİKLER -->
+                <div class="bg-white dark:bg-[#1a2835] rounded-lg shadow">
+                    <div class="flex items-center justify-between px-6 py-4 border-b border-slate-100/70 dark:border-slate-700/50">
+                        <p class="font-semibold text-sm">Yaklaşan Etkinlikler</p>
+                    </div>
+                    <div class="p-6 space-y-3">
+                        @if (upcoming.Any())
+                        {
+                            foreach (var ev in upcoming)
+                            {
+                                var c = GetColor(ev);
+                                <div class="flex items-start gap-3 p-2 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800/40">
+                                    <div class="h-3 w-3 rounded-full mt-1.5" style="background-color:@c"></div>
+                                    <div>
+                                        <p class="text-sm font-semibold">
+                                            @ev.Kategori
+                                            <span class="text-xs text-slate-400 ml-2">
+                                                @ev.BaslangicTarihi.ToString("dd.MM.yyyy")
+                                            </span>
+                                        </p>
+                                        <p class="text-xs text-slate-500 dark:text-slate-200">@ev.Aciklama</p>
+                                    </div>
+                                </div>
+                            }
+                        }
+                        else
+                        {
+                            <p class="text-sm text-slate-400">Yaklaşan etkinlik yok.</p>
+                        }
+                    </div>
+                </div>
+            </section>
         </div>
-    </div>
+    </main>
 </body>
