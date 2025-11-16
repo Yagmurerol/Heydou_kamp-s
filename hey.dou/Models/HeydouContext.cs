@@ -28,8 +28,10 @@ public partial class HeydouContext : DbContext
     public virtual DbSet<Oy> Oys { get; set; }
     public virtual DbSet<Event> Events { get; set; }
 
-    // === GÜNCELLEME: 6. FONKSİYON İÇİN YENİ MODEL ===
-    public virtual DbSet<Katilim> Katilimlar { get; set; }
+	public virtual DbSet<Kullanicilar> Kullanicilar { get; set; }
+
+	// === GÜNCELLEME: 6. FONKSİYON İÇİN YENİ MODEL ===
+	public virtual DbSet<Katilim> Katilimlar { get; set; }
     // ===============================================
 
 
