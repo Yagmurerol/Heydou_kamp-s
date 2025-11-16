@@ -1,0 +1,89 @@
+﻿@* === LOGIN SAYFASININ KENDİ TASARIM AYARLARI (CSS/CONFIG) === *@
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect" />
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+<link href="https://fonts.googleapis.com/css2?family=Epilogue:wght@400;500;700;800&amp;display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Pacifico&amp;display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+<style>
+        .material-symbols-outlined {
+               font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24    
+    }
+</style>
+<script id="tailwind-config-login">
+    tailwind.config = {
+        darkMode: "class", theme: {extend: {colors: {primary: "#b12121", "background-light": "#f8f6f6", "background-dark": "#201212", "card-light": "#FFFFFF", "card-dark": "#2A2A2A"}, fontFamily: {display: "Epilogue", heading: "'Pacifico', cursive"}}}
+    }
+</script>
+@{
+    // Bu sayfa _Layout.cshtml'i KULLANMASIN, çünkü kendi tasarımı var.
+    Layout = null;
+}
+<!DOCTYPE html>
+<html class="h-full" lang="tr">
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Giriş Yap</title>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-gray-800 dark:text-gray-200 h-full">
+    <div class="relative flex min-h-full w-full flex-col items-center justify-center p-4 sm:p-6">
+        <div class="absolute inset-0 bg-[url('https://tailwindcss.com/_next/static/media/docs@tinypng.61f4d333.png')] bg-center [mask-image:linear-gradient(180deg,white,rgba(255,255,255,0))]"></div>
+        <div class="relative w-full max-w-5xl">
+            <header class="text-center mb-10">
+                <h1 class="font-heading text-6xl sm:text-7xl md:text-8xl text-primary drop-shadow-lg">HeyDOU</h1>
+            </header>
+            <main class="w-full bg-card-light dark:bg-card-dark rounded-xl shadow-2xl overflow-hidden">
+                <div class="grid grid-cols-1 md:grid-cols-2">
+
+                    <div class="flex flex-col justify-center p-8 sm:p-12">
+                        <div class="w-full max-w-sm mx-auto">
+                            <div class="text-center mb-8">
+                                <h2 class="text-gray-900 dark:text-white text-2xl md:text-3xl font-bold tracking-tight">Öğrenci Girişi</h2>
+                                <p class="text-gray-500 dark:text-gray-400 mt-2">Hesabınıza giriş yapın</p>
+                            </div>
+
+                            <form asp-controller="Account" asp-action="StudentLogin" method="post" class="flex flex-col gap-y-5">
+                                <div class="relative">
+                                    <span class="material-symbols-outlined ...">person</span>
+                                    <input name="username" class="w-full rounded-lg ..." placeholder="Kullanıcı adınız" type="text" />
+                                </div>
+                                <div class="relative">
+                                    <span class="material-symbols-outlined ...">lock</span>
+                                    <input name="password" class="w-full rounded-lg ..." placeholder="Şifreniz" type="password" />
+                                </div>
+                                <button type="submit" class="mt-4 flex w-full ...">
+                                    <span class="truncate">Giriş Yap</span>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col justify-center bg-gray-50 dark:bg-black/20 p-8 sm:p-12 ...">
+                        <div class="w-full max-w-sm mx-auto">
+                            <div class="text-center mb-8">
+                                <h2 class="text-gray-900 dark:text-white text-2xl md:text-3xl font-bold tracking-tight">Personel Girişi</h2>
+                                <p class="text-gray-500 dark:text-gray-400 mt-2">Hesabınıza giriş yapın</p>
+                            </div>
+
+                            <form asp-controller="Account" asp-action="StaffLogin" method="post" class="flex flex-col gap-y-5">
+                                <div class="relative">
+                                    <span class="material-symbols-outlined ...">badge</span>
+                                    <input name="username" class="w-full rounded-lg ..." placeholder="Kullanıcı adınız" type="text" />
+                                </div>
+                                <div class="relative">
+                                    <span class="material-symbols-outlined ...">lock</span>
+                                    <input name="password" class="w-full rounded-lg ..." placeholder="Şifreniz" type="password" />
+                                </div>
+                                <button type="submit" class="mt-4 flex w-full ...">
+                                    <span class="truncate">Giriş Yap</span>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+</body>
+</html>

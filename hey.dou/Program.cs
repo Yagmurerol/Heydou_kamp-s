@@ -34,7 +34,7 @@ app.UseAuthorization();
 // API Controller'larýný eþleþtirmek için bu gereklidir
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
+    pattern: "{controller=Account}/{action=Login}/{id?}");
 
 // 'app.Run()' komutu en sonda olmalý
 app.Run();
