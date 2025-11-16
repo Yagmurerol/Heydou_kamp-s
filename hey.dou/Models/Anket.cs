@@ -7,7 +7,8 @@ namespace hey.dou.Models
     public partial class Anket
     {
         [Key]
-        public int AnketID { get; set; }
+        // DÜZELTME: AnketID -> AnketId
+        public int AnketId { get; set; }
 
         [Required]
         public string Title { get; set; } = null!;

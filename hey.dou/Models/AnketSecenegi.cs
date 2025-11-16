@@ -7,14 +7,17 @@ namespace hey.dou.Models
     public partial class AnketSecenegi
     {
         [Key]
-        public int SecenekID { get; set; }
+        // DÜZELTME: SecenekID -> SecenekId
+        public int SecenekId { get; set; }
 
         [Required]
         public string SecenekText { get; set; } = null!;
 
-        public int AnketID { get; set; }
+        // DÜZELTME: AnketID -> AnketId
+        public int AnketId { get; set; }
 
-        [ForeignKey("AnketID")]
+        // DÜZELTME: AnketID -> AnketId
+        [ForeignKey("AnketId")]
         public virtual Anket Anket { get; set; } = null!;
 
         public virtual ICollection<Oy> Oys { get; set; } = new HashSet<Oy>();

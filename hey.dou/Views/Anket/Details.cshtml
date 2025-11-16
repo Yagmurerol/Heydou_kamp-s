@@ -1,19 +1,51 @@
 ﻿@model hey.dou.Models.Anket
 @using System
+@using System.Linq
 
 @{
     Layout = null;
 
+    // 1. Mock Data Tanımlaması (Sadece görsel amaçlı)
+    var fixedOptionTexts = new List<string> { "Hafta Sonu Doğa Yürüyüşü", "Kutu Oyunu Gecesi", "Topluluk Gönüllülük Günü", "Kodlama Atölyesi" };
+    var initialMockVotes = new List<int> { 48, 75, 22, 12 };
+
     bool hasVoted = ViewBag.HasVoted != null && (bool)ViewBag.HasVoted;
-    bool isFinished = !Model.IsActive || Model.EndDate < DateTime.Now;
+    bool isFinished = Model.EndDate < DateTime.Now;
 
     var secenekler = Model.AnketSecenegis.ToList();
-    var oySayilari = secenekler.Select(s => s.Oys?.Count ?? 0).ToList();
-    int maxOy = oySayilari.Any() ? oySayilari.Max() : 0;
-    int toplamOy = oySayilari.Sum();
+    var gercekOySayilari = secenekler.Select(s => s.Oys?.Count ?? 0).ToList();
+    int gercekToplamOy = gercekOySayilari.Sum();
 
+    var gosterilenOylar = new List<int>();
+
+    // Mock data mantığı: Gerçek oy yoksa mock data ile başla
+    if (gercekToplamOy == 0 || !isFinished)
+    {
+        for (int i = 0; i < secenekler.Count; i++)
+        {
+            var secenek = secenekler[i];
+            int mockOy = 0;
+            int fixedIndex = fixedOptionTexts.IndexOf(secenek.SecenekText);
+            if (fixedIndex >= 0 && fixedIndex < initialMockVotes.Count)
+            {
+                mockOy = initialMockVotes[fixedIndex];
+            }
+            int oy = mockOy + gercekOySayilari.ElementAtOrDefault(i);
+            gosterilenOylar.Add(oy);
+        }
+    }
+    else
+    {
+        gosterilenOylar = gercekOySayilari;
+    }
+
+    int maxOy = gosterilenOylar.Any() ? gosterilenOylar.Max() : 0;
+    int toplamOy = gosterilenOylar.Sum();
+
+    // Kazanan hesaplaması (Mock + Gerçek Oylar üzerinden)
     var winner = secenekler
-        .OrderByDescending(s => s.Oys?.Count ?? 0)
+        .Select((s, index) => new { Secenek = s, OySayisi = gosterilenOylar.ElementAtOrDefault(index) })
+        .OrderByDescending(x => x.OySayisi)
         .FirstOrDefault();
 }
 
@@ -30,8 +62,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700;800&display=swap" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
     <style>
+        /* CSS Sözdizimi Düzeltildi */
         .material-symbols-outlined {
-            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
         }
     </style>
     <script id="tailwind-config">
@@ -93,18 +126,17 @@
                         }
                     </div>
 
-                    @* Anket bittiyse ve kazanan varsa üstte göster *@
+                    @* Sadece anket bittiyse kazananı ilan et *@
                     @if (isFinished && winner != null)
                     {
                         <div class="mt-4 inline-flex items-center gap-3 rounded-full bg-primary/10 px-4 py-2 text-sm font-semibold text-primary">
                             <span class="material-symbols-outlined">emoji_events</span>
-                            <span>Bu haftanın etkinliği: @winner.SecenekText</span>
+                            <span>Kazanan Etkinlik: @winner.Secenek.SecenekText</span>
                         </div>
                     }
                 </div>
 
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 xl:gap-12">
-                    <!-- SOL TARAF: Oy verme / mesaj alanı -->
                     <div class="flex flex-col gap-6">
                         <h2 class="text-gray-900 dark:text-white text-[22px] font-bold leading-tight tracking-[-0.015em]">
                             Oyunu Kullan
@@ -115,14 +147,18 @@
                         {
                             <form asp-action="Vote" method="post" class="flex flex-col gap-3">
                                 @Html.AntiForgeryToken()
-                                <input type="hidden" name="anketID" value="@Model.AnketID" />
+                                <input type="hidden" name="anketId" value="@Model.AnketId" /> @* DÜZELTME *@
 
                                 @foreach (var secenek in secenekler)
                                 {
-                                    <label class="flex items-center gap-4 rounded-lg border border-solid border-gray-200 dark:border-[#3b4f54] p-4 cursor-pointer hover:border-primary/50 dark:hover:border-primary/70 transition-colors has-[:checked]:border-primary has-[:checked]:bg-primary/10 dark:has-[:checked]:border-primary dark:has-[:checked]:bg-primary/20">
+                                    var titleText = $"Etkinlik: {secenek.SecenekText} | Açıklama: {Model.Description ?? "Yok"} | Tarih: {Model.EndDate.ToString("dd.MM.yyyy HH:mm")}";
+
+                                    <label class="flex items-center gap-4 rounded-lg border border-solid border-gray-200 dark:border-[#3b4f54] p-4 cursor-pointer hover:border-primary/50 dark:hover:border-primary/70 transition-colors has-[:checked]:border-primary has-[:checked]:bg-primary/10 dark:has-[:checked]:border-primary dark:has-[:checked]:bg-primary/20"
+                                           title="@titleText">
+
                                         <input type="radio"
-                                               name="secenekID"
-                                               value="@secenek.SecenekID"
+                                               name="secenekId" @* DÜZELTME *@
+                                               value="@secenek.SecenekId" @* DÜZELTME *@
                                                class="h-5 w-5 border-2 border-gray-300 dark:border-[#3b4f54] bg-transparent text-primary focus:ring-primary checked:border-primary checked:bg-primary dark:checked:border-primary dark:checked:bg-primary"
                                                required />
 
@@ -171,9 +207,8 @@
                         }
                     </div>
 
-                    <!-- SAĞ TARAF: Canlı sonuçlar (sadece oy varsa veya anket bittiyse) -->
                     <div class="lg:col-span-1">
-                        @if ((hasVoted || toplamOy > 0 || isFinished) && secenekler.Any())
+                        @if (secenekler.Any())
                         {
                             <div class="bg-white/50 dark:bg-black/20 rounded-xl p-6 h-full flex flex-col">
                                 <h2 class="text-gray-900 dark:text-white text-[22px] font-bold leading-tight tracking-[-0.015em] mb-6">
@@ -185,12 +220,14 @@
                                         @for (int i = 0; i < secenekler.Count; i++)
                                         {
                                             var secenek = secenekler[i];
-                                            var oy = oySayilari[i];
+                                            var oy = gosterilenOylar.ElementAtOrDefault(i);
                                             int heightPercent = maxOy > 0 ? (int)Math.Round(oy * 100.0 / maxOy) : 0;
-                                            bool isWinner = winner != null && secenek.SecenekID == winner.SecenekID && toplamOy > 0;
+
+                                            // SecenekId kullanıldı.
+                                            bool isWinnerBar = isFinished && winner != null && secenek.SecenekId == winner.Secenek.SecenekId;
 
                                             <div class="flex flex-col items-center justify-end w-full h-full gap-2 relative">
-                                                @if (isWinner && (isFinished || toplamOy > 0))
+                                                @if (isWinnerBar && toplamOy > 0)
                                                 {
                                                     <div class="absolute -top-11 flex flex-col items-center justify-center gap-1">
                                                         <div class="rounded-full bg-primary px-2.5 py-1 text-xs font-bold uppercase text-background-dark shadow-lg shadow-primary/30">
@@ -201,7 +238,7 @@
                                                 }
 
                                                 <div class="text-sm font-semibold text-gray-800 dark:text-white">@oy</div>
-                                                <div class="w-full @(isWinner ? "bg-primary" : "bg-primary/20 dark:bg-primary/40") rounded-t-md"
+                                                <div class="w-full @(isWinnerBar ? "bg-primary" : "bg-primary/20 dark:bg-primary/40") rounded-t-md"
                                                      style="height: @heightPercent%;"></div>
                                             </div>
                                         }
@@ -211,7 +248,7 @@
                                         @foreach (var secenek in secenekler)
                                         {
                                             <p class="text-center text-xs text-gray-500 dark:text-[#9db4b9] w-full">
-                                                @secenek.SecenekText
+                                                @(secenek.SecenekText.Length > 12 ? secenek.SecenekText.Substring(0, 5) + "..." : secenek.SecenekText)
                                             </p>
                                         }
                                     </div>
@@ -230,7 +267,7 @@
                                     Canlı Sonuçlar
                                 </h2>
                                 <p class="text-sm text-gray-600 dark:text-[#9db4b9]">
-                                    Henüz oy verilmedi. Oy verdikten sonra burada grafiği göreceksiniz.
+                                    Henüz oy verilmedi veya anket seçenekleri yüklenemedi.
                                 </p>
                             </div>
                         }
@@ -267,30 +304,39 @@
             (function () {
                 const endTime = new Date('@Model.EndDate.ToString("yyyy-MM-ddTHH:mm:ss")');
                 const el = document.getElementById("countdown");
-                if (!el) return;
 
                 function updateCountdown() {
                     const now = new Date();
                     let diff = (endTime - now) / 1000;
 
                     if (diff <= 0) {
-                        el.textContent = "00:00:00";
+                        el.textContent = "Sona Erdi";
                         return;
                     }
 
+                    const d = Math.floor(diff / (3600 * 24));
+                    diff -= d * 3600 * 24;
                     const h = Math.floor(diff / 3600);
                     diff -= h * 3600;
                     const m = Math.floor(diff / 60);
                     const s = Math.floor(diff % 60);
 
-                    el.textContent =
-                        String(h).padStart(2, '0') + ":" +
-                        String(m).padStart(2, '0') + ":" +
-                        String(s).padStart(2, '0');
+                    let output = "";
+                    if (d > 0) {
+                        output += `${d} gün, `;
+                    }
+
+                    output += String(h).padStart(2, '0') + ":" +
+                              String(m).padStart(2, '0') + ":" +
+                              String(s).padStart(2, '0');
+
+                    el.textContent = output;
                 }
 
-                updateCountdown();
-                setInterval(updateCountdown, 1000);
+                if (el) {
+                    updateCountdown();
+                    setInterval(updateCountdown, 1000);
+                }
             })();
         </script>
     }
