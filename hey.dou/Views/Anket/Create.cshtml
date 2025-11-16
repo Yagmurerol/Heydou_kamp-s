@@ -1,0 +1,117 @@
+﻿@model hey.dou.Models.Anket
+
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Yeni Etkinlik Oluştur</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700;800&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#de7d7d",
+                        "background-light": "#f8f6f6",
+                        "background-dark": "#1f1313"
+                    },
+                    fontFamily: {
+                        display: "Plus Jakarta Sans"
+                    },
+                    borderRadius: {
+                        DEFAULT: "0.5rem",
+                        lg: "1rem",
+                        xl: "1.5rem",
+                        full: "9999px"
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-background-light font-display text-gray-800">
+    <div class="relative flex min-h-screen w-full flex-col">
+        <main class="flex-grow">
+            <div class="container mx-auto px-4 py-8 md:py-12 lg:px-8">
+                <div class="mx-auto max-w-2xl">
+                    <div class="text-center mb-8 md:mb-12">
+                        <h1 class="text-gray-900 text-3xl md:text-4xl font-black leading-tight tracking-[-0.033em]">
+                            Yeni Etkinlik Oluştur
+                        </h1>
+                        <p class="text-gray-500 text-base font-normal leading-normal mt-2">
+                            Yeni bir kulüp etkinliği eklemek için aşağıdaki formu doldurun.
+                        </p>
+                    </div>
+
+                    <div class="bg-white/50 rounded-xl p-6 md:p-8 shadow-sm">
+                        <form asp-action="Create" method="post" class="flex flex-col gap-6">
+                            @Html.AntiForgeryToken()
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2" for="club-name">Kulüp Adı</label>
+                                <input class="w-full rounded-lg border border-solid border-gray-300 bg-transparent focus:border-primary focus:ring-primary transition-colors"
+                                       id="club-name"
+                                       placeholder="Örn: Edebiyat Kulübü"
+                                       type="text" />
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2" for="president-name">Kulüp Başkanı Adı</label>
+                                <input class="w-full rounded-lg border border-solid border-gray-300 bg-transparent focus:border-primary focus:ring-primary transition-colors"
+                                       id="president-name"
+                                       placeholder="Örn: Ayşe Yılmaz"
+                                       type="text" />
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2" asp-for="Title">Etkinlik Adı</label>
+                                <input asp-for="Title"
+                                       class="w-full rounded-lg border border-solid border-gray-300 bg-transparent focus:border-primary focus:ring-primary transition-colors"
+                                       placeholder="Örn: Yıllık Kitap Fuarı" />
+                                <span asp-validation-for="Title" class="text-red-500 text-sm"></span>
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2" for="event-location">Konum</label>
+                                <input class="w-full rounded-lg border border-solid border-gray-300 bg-transparent focus:border-primary focus:ring-primary transition-colors"
+                                       id="event-location"
+                                       placeholder="Örn: Üniversite Kütüphanesi"
+                                       type="text" />
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2" asp-for="EndDate">Tarih ve Saat</label>
+                                <input asp-for="EndDate"
+                                       type="datetime-local"
+                                       class="w-full rounded-lg border border-solid border-gray-300 bg-transparent focus:border-primary focus:ring-primary transition-colors" />
+                                <span asp-validation-for="EndDate" class="text-red-500 text-sm"></span>
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2" asp-for="Description">Kısa Açıklama</label>
+                                <textarea asp-for="Description"
+                                          rows="4"
+                                          class="w-full rounded-lg border border-solid border-gray-300 bg-transparent focus:border-primary focus:ring-primary transition-colors"
+                                          placeholder="Etkinliğin kısa bir özetini yazın..."></textarea>
+                            </div>
+
+                            <div class="mt-4">
+                                <button type="submit"
+                                        class="flex w-full cursor-pointer items-center justify-center overflow-hidden rounded-lg h-12 px-5 bg-primary text-background-dark text-base font-bold leading-normal tracking-[0.015em] hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed">
+                                    <span class="truncate">Etkinlik Ekle</span>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</body>
+</html>

@@ -1,0 +1,44 @@
+﻿@model IEnumerable<hey.dou.Models.Anket>
+
+@{
+    ViewData["Title"] = "Kulüp Etkinliği Anketleri";
+}
+
+<div class="container mt-4">
+    <h2>@ViewData["Title"]</h2>
+
+    <p class="text-muted">
+        Aktif anketlerden birini seçip oy verebilirsiniz.
+    </p>
+
+    @if (!Model.Any())
+    {
+        <p>Şu anda oy verebileceğiniz aktif bir anket bulunmuyor.</p>
+    }
+    else
+    {
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th>Başlık</th>
+                    <th>Bitiş Tarihi</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var anket in Model)
+                {
+                    <tr>
+                        <td>@anket.Title</td>
+                        <td>@anket.EndDate.ToString("dd.MM.yyyy HH:mm")</td>
+                        <td>
+                            <a asp-action="Details" asp-route-id="@anket.AnketID" class="btn btn-primary btn-sm">
+                                Oy Ver / Sonuçları Gör
+                            </a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</div>
