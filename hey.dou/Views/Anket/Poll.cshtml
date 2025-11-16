@@ -1,55 +1,48 @@
 ﻿@model hey.dou.Models.Anket
 @using System
+@using System.Linq
 
 @{
     Layout = null;
 
-    // 1. Mock Data Tanımlaması: Görüntüdeki başlangıç oyları
-    // NOT: Bu verileri sadece gerçek oy sayısı 0 ise kullanıyoruz.
+    // 1. Mock Data Tanımlaması (6. fonksiyona uyum için)
     var fixedOptionTexts = new List<string> { "Hafta Sonu Doğa Yürüyüşü", "Kutu Oyunu Gecesi", "Topluluk Gönüllülük Günü", "Kodlama Atölyesi" };
-    var initialMockVotes = new List<int> { 48, 75, 22, 12 }; // Toplam 157 Oy (Görüntüdeki gibi)
+    var initialMockVotes = new List<int> { 48, 75, 22, 12 };
 
     bool hasVoted = ViewBag.HasVoted != null && (bool)ViewBag.HasVoted;
-    // Anketin bitiş tarihi geçip geçmediğini kontrol et
     bool isFinished = Model.EndDate < DateTime.Now;
 
     var secenekler = Model.AnketSecenegis.ToList();
     var gercekOySayilari = secenekler.Select(s => s.Oys?.Count ?? 0).ToList();
     int gercekToplamOy = gercekOySayilari.Sum();
 
-    // Grafik ve kazanan için kullanılacak Oylar (Mock + Gerçek)
     var gosterilenOylar = new List<int>();
 
-    // Eğer hiç gerçek oy yoksa VEYA anket bitmemişse ve mock data kullanılıyorsa, mock datayı kullan
+    // Mock data mantığı
     if (gercekToplamOy == 0 || !isFinished)
     {
         for (int i = 0; i < secenekler.Count; i++)
         {
             var secenek = secenekler[i];
             int mockOy = 0;
-            // Sabit seçenekler için mock değeri bul
             int fixedIndex = fixedOptionTexts.IndexOf(secenek.SecenekText);
             if (fixedIndex >= 0 && fixedIndex < initialMockVotes.Count)
             {
                 mockOy = initialMockVotes[fixedIndex];
             }
-
-            // Eğer gerçek oy yoksa ve mock varsa, sadece mock oyu kullan (ilk açılışta)
-            int oy = mockOy + gercekOySayilari[i];
+            int oy = mockOy + gercekOySayilari.ElementAtOrDefault(i);
             gosterilenOylar.Add(oy);
         }
     }
     else
     {
-        // Anket bittiyse ve gerçek oy varsa, sadece gerçek oyları kullan
         gosterilenOylar = gercekOySayilari;
     }
-
 
     int maxOy = gosterilenOylar.Any() ? gosterilenOylar.Max() : 0;
     int toplamOy = gosterilenOylar.Sum();
 
-    // Kazanan, daima en çok oyu alandır (Mock + Gerçek). Sadece süre bitince ilan edilir.
+    // Kazanan hesaplaması
     var winner = secenekler
         .Select((s, index) => new { Secenek = s, OySayisi = gosterilenOylar.ElementAtOrDefault(index) })
         .OrderByDescending(x => x.OySayisi)
@@ -69,8 +62,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700;800&display=swap" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
     <style>
+        /* CSS Sözdizimi Düzeltildi */
         .material-symbols-outlined {
-            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
         }
     </style>
     <script id="tailwind-config">
@@ -103,10 +97,12 @@
             <div class="container mx-auto px-4 py-8 md:py-12 lg:px-8">
                 <div class="mb-10 text-center">
                     <h1 class="text-gray-900 dark:text-white text-3xl md:text-4xl font-black leading-tight tracking-[-0.033em]">
-                        Bir Sonraki Kulüp Etkinliğimiz İçin Oy Verin!
+                        @Model.Title
                     </h1>
                     <p class="text-gray-500 dark:text-[#9db4b9] text-base font-normal leading-normal mt-2">
-                        Sırada ne yapacağımıza karar vermemize yardımcı olmak için oyunuzu kullanın.
+                        @(!string.IsNullOrWhiteSpace(Model.Description)
+                                                ? Model.Description
+                                                : "Sırada ne yapacağımıza karar vermemize yardımcı olmak için oyunuzu kullanın.")
                     </p>
 
                     <div class="mt-3 flex items-center justify-center gap-3 text-sm text-gray-600 dark:text-[#9db4b9]">
@@ -146,25 +142,23 @@
                             Oyunu Kullan
                         </h2>
 
-                        @* 1) Henüz oy vermemişse ve bitmediyse formu göster *@
+                        @* 1) Henüz oy vermemişse formu göster *@
                         @if (!isFinished && !hasVoted)
                         {
                             <form asp-action="Vote" method="post" class="flex flex-col gap-3">
                                 @Html.AntiForgeryToken()
-                                <input type="hidden" name="anketID" value="@Model.AnketID" />
+                                <input type="hidden" name="anketId" value="@Model.AnketId" /> @* DÜZELTME: AnketID -> AnketId *@
 
                                 @foreach (var secenek in secenekler)
                                 {
-                                    // Tooltip için title özelliği eklendi. (Kulüp Başkanı Adı modelde olmadığı için eklenmedi, Kulüp Adı varsayıldı)
                                     var titleText = $"Etkinlik: {secenek.SecenekText} | Açıklama: {Model.Description ?? "Yok"} | Tarih: {Model.EndDate.ToString("dd.MM.yyyy HH:mm")}";
 
-                                    <label class="flex items-center gap-4 rounded-lg border border-solid border-gray-200 dark:border-[#3b4f54] p-4 cursor-pointer hover:border-primary/50 dark:hover:border-primary/70 transition-colors has-[:checked]:border-primary has-[:checked]:bg-primary/10 dark:has-[:checked]:border-primary dark:has-[:checked]:bg-primary"
+                                    <label class="flex items-center gap-4 rounded-lg border border-solid border-gray-200 dark:border-[#3b4f54] p-4 cursor-pointer hover:border-primary/50 dark:hover:border-primary/70 transition-colors has-[:checked]:border-primary has-[:checked]:bg-primary/10 dark:has-[:checked]:border-primary dark:has-[:checked]:bg-primary/20"
                                            title="@titleText">
-                                        @* TITLE EKLENDİ *@
 
                                         <input type="radio"
-                                               name="secenekID"
-                                               value="@secenek.SecenekID"
+                                               name="secenekId" @* DÜZELTME: secenekID -> secenekId *@
+                                               value="@secenek.SecenekId" @* DÜZELTME: SecenekID -> SecenekId *@
                                                class="h-5 w-5 border-2 border-gray-300 dark:border-[#3b4f54] bg-transparent text-primary focus:ring-primary checked:border-primary checked:bg-primary dark:checked:border-primary dark:checked:bg-primary"
                                                required />
 
@@ -226,10 +220,11 @@
                                         @for (int i = 0; i < secenekler.Count; i++)
                                         {
                                             var secenek = secenekler[i];
-                                            var oy = gosterilenOylar.ElementAtOrDefault(i); // Mock + Gerçek Oy
+                                            var oy = gosterilenOylar.ElementAtOrDefault(i);
                                             int heightPercent = maxOy > 0 ? (int)Math.Round(oy * 100.0 / maxOy) : 0;
-                                            // Kazananı ilan etme kontrolü sadece isFinished true olduğunda gerçekleşecek
-                                            bool isWinnerBar = isFinished && winner != null && secenek.SecenekID == winner.Secenek.SecenekID;
+
+                                            // SecenekId kullanıldı.
+                                            bool isWinnerBar = isFinished && winner != null && secenek.SecenekId == winner.Secenek.SecenekId;
 
                                             <div class="flex flex-col items-center justify-end w-full h-full gap-2 relative">
                                                 @if (isWinnerBar && toplamOy > 0)
@@ -307,28 +302,24 @@
     {
         <script>
             (function () {
-                // Sunucudan gelen bitiş tarihi (ISO 8601 formatında)
                 const endTime = new Date('@Model.EndDate.ToString("yyyy-MM-ddTHH:mm:ss")');
                 const el = document.getElementById("countdown");
-                if (!el) return;
 
                 function updateCountdown() {
                     const now = new Date();
                     let diff = (endTime - now) / 1000;
 
                     if (diff <= 0) {
-                        el.textContent = "Sona Erdi"; // Süre bitince sona erdi yaz
-                        // Opsiyonel: Süre bitince sayfayı yenileyebilirsiniz.
-                        // setTimeout(() => window.location.reload(), 1000);
+                        el.textContent = "Sona Erdi";
                         return;
                     }
 
-                    const d = Math.floor(diff / (3600 * 24)); // Gün hesaplandı
+                    const d = Math.floor(diff / (3600 * 24));
                     diff -= d * 3600 * 24;
                     const h = Math.floor(diff / 3600);
                     diff -= h * 3600;
                     const m = Math.floor(diff / 60);
-                    const s = Math.floor(diff % 60); // MODULO DÜZELTİLDİ
+                    const s = Math.floor(diff % 60);
 
                     let output = "";
                     if (d > 0) {
@@ -342,8 +333,10 @@
                     el.textContent = output;
                 }
 
-                updateCountdown();
-                setInterval(updateCountdown, 1000);
+                if (el) {
+                    updateCountdown();
+                    setInterval(updateCountdown, 1000);
+                }
             })();
         </script>
     }

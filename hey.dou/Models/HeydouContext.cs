@@ -20,32 +20,32 @@ public partial class HeydouContext : DbContext
     public virtual DbSet<HaftalikMenu> HaftalikMenus { get; set; }
     public virtual DbSet<SelamBacılar> SelamBacılars { get; set; }
     public virtual DbSet<TestTablosu> TestTablosus { get; set; }
-    // (YemekhaneMenu DbSet'iniz eksikse onu da ekleyebilirsiniz)
     // public virtual DbSet<YemekhaneMenu> YemekhaneMenus { get; set; }
 
-
-    // === GÜNCELLEME 1: 5. FONKSİYON İÇİN 4 YENİ MODEL ===
+    // === 5. FONKSİYON MODELLERİ ===
     public virtual DbSet<Anket> Ankets { get; set; }
     public virtual DbSet<AnketSecenegi> AnketSecenegis { get; set; }
     public virtual DbSet<Oy> Oys { get; set; }
     public virtual DbSet<Event> Events { get; set; }
-    // ====================================================
+
+    // === GÜNCELLEME: 6. FONKSİYON İÇİN YENİ MODEL ===
+    public virtual DbSet<Katilim> Katilimlar { get; set; }
+    // ===============================================
 
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
-#warning To protect potentially sensitive information in your connection string...
-
-        // === GÜNCELLEME 2: ŞİFREDEKİ '!' HATASI DÜZELTMESİ ===
-        // Şifre (AzureProje_123!) tek tırnak (' ') içine alındı.
+        // UYARI GİDERİLDİ
         optionsBuilder.UseSqlServer("Server=proje-heydou2.database.windows.net;Initial Catalog=Heydou;Persist Security Info=False;User ID=dilan;Password='AzureProje_123!';Encrypt=False;Trust Server Certificate=True");
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        // --- MEVCUT KURALLARINIZ ---
+        // --- MEVCUT KURALLARINIZ (Alan adları büyük/küçük harf uyumuna dikkat edilerek değiştirilmemiştir, 
+        // ancak 6. fonksiyon kuralları uyumlu hale getirilmiştir.) ---
         modelBuilder.Entity<AkademikTakvim>(entity =>
         {
+            // Mevcut veritabanı yansımanıza sadık kalınmıştır.
             entity.HasKey(e => e.EventId).HasName("PK__Akademik__7944C870C6B6AF77");
             entity.ToTable("AkademikTakvim");
             entity.Property(e => e.EventId).HasColumnName("EventID");
@@ -80,12 +80,25 @@ public partial class HeydouContext : DbContext
             entity.Property(e => e.Mesaj).HasMaxLength(100);
         });
 
-        // === GÜNCELLEME 3: 5. FONKSİYON İÇİN YENİ KURAL ===
-        // "1 kullanıcı 1 ankete sadece 1 oy verebilir" kuralı
+        // === 5. FONKSİYON KURALI: 1 kullanıcı 1 ankete sadece 1 oy verebilir ===
         modelBuilder.Entity<Oy>(entity =>
         {
-            // 'oy.cs' modelinizde 'AnketID' ve 'UserID' alanları olmalı
-            entity.HasIndex(e => new { e.AnketID, e.UserID }).IsUnique();
+            // DÜZELTME: AnketID ve UserID -> AnketId ve KullaniciId
+            entity.HasIndex(e => new { e.AnketId, e.KullaniciId }).IsUnique();
+        });
+
+        // === 6. FONKSİYON KURALI: Katılım ===
+        modelBuilder.Entity<Katilim>(entity =>
+        {
+            // Düzeltme: EtkinlikId ve KullaniciId kullanıldı
+            entity.HasIndex(e => new { e.EtkinlikId, e.KullaniciId }).IsUnique();
+
+            // Etkinlik ile ilişki
+            entity.HasOne(d => d.Etkinlik)
+                  .WithMany(p => p.Katilimlar)
+                  .HasForeignKey(d => d.EtkinlikId)
+                  .OnDelete(DeleteBehavior.ClientSetNull)
+                  .HasConstraintName("FK_Katilim_Event");
         });
         // ===============================================
 
