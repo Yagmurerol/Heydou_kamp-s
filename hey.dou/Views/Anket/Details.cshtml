@@ -1,344 +1,228 @@
 ﻿@model hey.dou.Models.Anket
-@using System
-@using System.Linq
-
 @{
-    Layout = null;
+    ViewData["Title"] = "Etkinlik Anketi";
+    bool hasVoted = ViewBag.HasVoted ?? false;
 
-    // 1. Mock Data Tanımlaması (Sadece görsel amaçlı)
-    var fixedOptionTexts = new List<string> { "Hafta Sonu Doğa Yürüyüşü", "Kutu Oyunu Gecesi", "Topluluk Gönüllülük Günü", "Kodlama Atölyesi" };
-    var initialMockVotes = new List<int> { 48, 75, 22, 12 };
-
-    bool hasVoted = ViewBag.HasVoted != null && (bool)ViewBag.HasVoted;
-    bool isFinished = Model.EndDate < DateTime.Now;
-
-    var secenekler = Model.AnketSecenegis.ToList();
-    var gercekOySayilari = secenekler.Select(s => s.Oys?.Count ?? 0).ToList();
-    int gercekToplamOy = gercekOySayilari.Sum();
-
-    var gosterilenOylar = new List<int>();
-
-    // Mock data mantığı: Gerçek oy yoksa mock data ile başla
-    if (gercekToplamOy == 0 || !isFinished)
-    {
-        for (int i = 0; i < secenekler.Count; i++)
-        {
-            var secenek = secenekler[i];
-            int mockOy = 0;
-            int fixedIndex = fixedOptionTexts.IndexOf(secenek.SecenekText);
-            if (fixedIndex >= 0 && fixedIndex < initialMockVotes.Count)
-            {
-                mockOy = initialMockVotes[fixedIndex];
-            }
-            int oy = mockOy + gercekOySayilari.ElementAtOrDefault(i);
-            gosterilenOylar.Add(oy);
-        }
-    }
-    else
-    {
-        gosterilenOylar = gercekOySayilari;
-    }
-
-    int maxOy = gosterilenOylar.Any() ? gosterilenOylar.Max() : 0;
-    int toplamOy = gosterilenOylar.Sum();
-
-    // Kazanan hesaplaması (Mock + Gerçek Oylar üzerinden)
-    var winner = secenekler
-        .Select((s, index) => new { Secenek = s, OySayisi = gosterilenOylar.ElementAtOrDefault(index) })
-        .OrderByDescending(x => x.OySayisi)
-        .FirstOrDefault();
+    var orderedOptions = Model.AnketSecenegis.OrderBy(s => s.SecenekId).ToList();
+    int totalVotes = orderedOptions.Sum(s => s.Oys.Count);
+    var winningOption = (totalVotes > 0) ? orderedOptions.OrderByDescending(s => s.Oys.Count).FirstOrDefault() : null;
 }
 
-<!DOCTYPE html>
-<html lang="tr">
-<head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@Model.Title - Kulüp Etkinliği Anketi</title>
-
-    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700;800&display=swap" rel="stylesheet" />
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
-    <style>
-        /* CSS Sözdizimi Düzeltildi */
-        .material-symbols-outlined {
-            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
-        }
-    </style>
-    <script id="tailwind-config">
-        tailwind.config = {
-            darkMode: "class",
-            theme: {
-                extend: {
-                    colors: {
-                        primary: "#de7d7d",
-                        "background-light": "#f8f6f6",
-                        "background-dark": "#1f1313"
-                    },
-                    fontFamily: {
-                        display: "Plus Jakarta Sans"
-                    },
-                    borderRadius: {
-                        DEFAULT: "0.5rem",
-                        lg: "1rem",
-                        xl: "1.5rem",
-                        full: "9999px"
-                    }
-                }
-            }
-        };
-    </script>
-</head>
 <body class="bg-background-light dark:bg-background-dark font-display text-gray-800 dark:text-gray-200">
     <div class="relative flex min-h-screen w-full flex-col">
         <main class="flex-grow">
             <div class="container mx-auto px-4 py-8 md:py-12 lg:px-8">
-                <div class="mb-10 text-center">
-                    <h1 class="text-gray-900 dark:text-white text-3xl md:text-4xl font-black leading-tight tracking-[-0.033em]">
-                        @Model.Title
-                    </h1>
-                    <p class="text-gray-500 dark:text-[#9db4b9] text-base font-normal leading-normal mt-2">
-                        @(!string.IsNullOrWhiteSpace(Model.Description)
-                                                ? Model.Description
-                                                : "Sırada ne yapacağımıza karar vermemize yardımcı olmak için oyunuzu kullanın.")
-                    </p>
 
-                    <div class="mt-3 flex items-center justify-center gap-3 text-sm text-gray-600 dark:text-[#9db4b9]">
-                        <span class="material-symbols-outlined text-primary">event</span>
-                        <span>
-                            Bitiş Tarihi:
-                            <strong>@Model.EndDate.ToString("dd.MM.yyyy HH:mm")</strong>
-                        </span>
-                        <span class="mx-2">•</span>
-                        @if (!isFinished)
-                        {
-                            <span class="inline-flex items-center rounded-full bg-green-100 text-green-700 px-3 py-1 text-xs font-semibold">
-                                Aktif Anket
-                            </span>
-                        }
-                        else
-                        {
-                            <span class="inline-flex items-center rounded-full bg-gray-200 text-gray-700 px-3 py-1 text-xs font-semibold">
-                                Anket Sona Erdi
-                            </span>
-                        }
+                <div class="mb-10 text-center relative">
+                    <div class="flex items-center justify-center gap-3">
+                        <h1 class="text-gray-900 dark:text-white text-3xl md:text-4xl font-black leading-tight tracking-[-0.033em]">
+                            Etkinlik Anketi
+                        </h1>
+
+                        <button type="button" onclick="openModal(event)" class="text-gray-400 hover:text-primary transition-colors duration-200 focus:outline-none" title="Etkinlik Detaylarını Gör">
+                            <span class="material-symbols-outlined text-3xl">info</span>
+                        </button>
                     </div>
 
-                    @* Sadece anket bittiyse kazananı ilan et *@
-                    @if (isFinished && winner != null)
-                    {
-                        <div class="mt-4 inline-flex items-center gap-3 rounded-full bg-primary/10 px-4 py-2 text-sm font-semibold text-primary">
-                            <span class="material-symbols-outlined">emoji_events</span>
-                            <span>Kazanan Etkinlik: @winner.Secenek.SecenekText</span>
-                        </div>
-                    }
+                    <p class="text-gray-500 dark:text-[#9db4b9] text-base font-normal leading-normal mt-2">
+                        Aşağıdaki seçeneklerden birini oylayarak etkinliği belirleyin.
+                    </p>
                 </div>
 
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 xl:gap-12">
+
                     <div class="flex flex-col gap-6">
-                        <h2 class="text-gray-900 dark:text-white text-[22px] font-bold leading-tight tracking-[-0.015em]">
-                            Oyunu Kullan
-                        </h2>
+                        <h2 class="text-gray-900 dark:text-white text-[22px] font-bold leading-tight tracking-[-0.015em]">Oyunu Kullan</h2>
 
-                        @* 1) Henüz oy vermemişse formu göster *@
-                        @if (!isFinished && !hasVoted)
-                        {
-                            <form asp-action="Vote" method="post" class="flex flex-col gap-3">
-                                @Html.AntiForgeryToken()
-                                <input type="hidden" name="anketId" value="@Model.AnketId" /> @* DÜZELTME *@
+                        <form asp-action="Vote" method="post">
+                            <input type="hidden" name="anketID" value="@Model.AnketId" />
 
-                                @foreach (var secenek in secenekler)
+                            <div class="flex flex-col gap-3">
+                                @foreach (var secenek in orderedOptions)
                                 {
-                                    var titleText = $"Etkinlik: {secenek.SecenekText} | Açıklama: {Model.Description ?? "Yok"} | Tarih: {Model.EndDate.ToString("dd.MM.yyyy HH:mm")}";
+                                    bool isCustomEvent = (secenek.SecenekText == Model.Title);
 
-                                    <label class="flex items-center gap-4 rounded-lg border border-solid border-gray-200 dark:border-[#3b4f54] p-4 cursor-pointer hover:border-primary/50 dark:hover:border-primary/70 transition-colors has-[:checked]:border-primary has-[:checked]:bg-primary/10 dark:has-[:checked]:border-primary dark:has-[:checked]:bg-primary/20"
-                                           title="@titleText">
+                                    <div class="relative group">
+                                        <label class="flex items-center gap-4 rounded-lg border border-solid border-gray-200 dark:border-[#3b4f54] p-4 cursor-pointer hover:border-primary/50 transition-colors has-[:checked]:border-primary has-[:checked]:bg-primary/10 dark:has-[:checked]:bg-primary/20">
 
-                                        <input type="radio"
-                                               name="secenekId" @* DÜZELTME *@
-                                               value="@secenek.SecenekId" @* DÜZELTME *@
-                                               class="h-5 w-5 border-2 border-gray-300 dark:border-[#3b4f54] bg-transparent text-primary focus:ring-primary checked:border-primary checked:bg-primary dark:checked:border-primary dark:checked:bg-primary"
-                                               required />
+                                            <input class="h-5 w-5 border-2 border-gray-300 dark:border-[#3b4f54] bg-transparent text-primary focus:ring-primary checked:border-primary checked:bg-primary"
+                                                   name="secenekID" value="@secenek.SecenekId" type="radio" required disabled="@(hasVoted || !Model.IsActive)" />
 
-                                        <div class="flex grow flex-col">
-                                            <p class="text-gray-900 dark:text-white text-base font-medium leading-normal">
-                                                @secenek.SecenekText
-                                            </p>
-                                        </div>
-                                    </label>
+                                            <div class="flex grow items-center justify-between">
+                                                <p class="text-gray-900 dark:text-white text-base font-medium leading-normal">
+                                                    @secenek.SecenekText
+                                                </p>
+
+                                                @if (isCustomEvent)
+                                                {
+                                                    <button type="button" onclick="openModal(event)" class="text-primary hover:text-red-600 transition-colors p-1 rounded-full hover:bg-primary/10" title="Detayları Gör">
+                                                        <span class="material-symbols-outlined text-2xl">info</span>
+                                                    </button>
+                                                }
+                                            </div>
+                                        </label>
+                                    </div>
                                 }
+                            </div>
 
-                                <div class="mt-2">
-                                    <button type="submit"
-                                            class="flex min-w-[84px] w-full max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-12 px-5 bg-primary text-background-dark text-base font-bold leading-normal tracking-[0.015em] hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed">
-                                        <span class="truncate">Oy Ver</span>
-                                    </button>
-                                </div>
-                            </form>
-                        }
-                        @* 2) Oy verdiyse ama anket henüz bitmediyse bilgi mesajı *@
-                        else if (!isFinished && hasVoted)
-                        {
-                            <div class="rounded-lg border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-800">
-                                Bu ankete zaten oy verdiniz. Canlı sonuçlar sağ tarafta gösteriliyor.
-                            </div>
-                        }
-                        @* 3) Anket bittiyse *@
-                        else
-                        {
-                            <div class="rounded-lg border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-700">
-                                Bu anket sona erdi. Sonuçları sağ taraftan inceleyebilirsiniz.
-                            </div>
-                        }
+                            <div class="mt-4">
+                                <button type="submit" class="flex min-w-[84px] w-full max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-12 px-5 bg-primary text-white text-base font-bold leading-normal hover:bg-opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
+                                        disabled="@(hasVoted || !Model.IsActive)">
+                                    @if (hasVoted)
+                                    {
+                                        <span>Oy Verdiniz</span>
+                                    }
+                                    else if (!Model.IsActive)
+                                    {
 
-                        @if (TempData["Success"] != null)
-                        {
-                            <div class="rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-800">
-                                @TempData["Success"]
+                                        <span>Anket Kapandı</span>
+                                    }
+                                    else
+                                    {
+
+                                        <span>Oy Ver</span>
+                                    }
+                                </button>
                             </div>
-                        }
-                        @if (TempData["Error"] != null)
-                        {
-                            <div class="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
-                                @TempData["Error"]
-                            </div>
-                        }
+                        </form>
                     </div>
 
                     <div class="lg:col-span-1">
-                        @if (secenekler.Any())
-                        {
-                            <div class="bg-white/50 dark:bg-black/20 rounded-xl p-6 h-full flex flex-col">
-                                <h2 class="text-gray-900 dark:text-white text-[22px] font-bold leading-tight tracking-[-0.015em] mb-6">
-                                    Canlı Sonuçlar
-                                </h2>
+                        <div class="bg-white/50 dark:bg-black/20 rounded-xl p-6 h-full flex flex-col">
+                            <h2 class="text-gray-900 dark:text-white text-[22px] font-bold leading-tight tracking-[-0.015em] mb-6">Canlı Sonuçlar</h2>
+                            <div class="flex flex-col flex-grow">
+                                <div class="flex items-end justify-between gap-4 h-[300px] border-b border-dashed border-gray-300 dark:border-white/20 pb-2">
+                                    @foreach (var secenek in orderedOptions)
+                                    {
+                                        int voteCount = secenek.Oys.Count;
+                                        double heightPercent = (winningOption != null && winningOption.Oys.Count > 0) ? (((double)voteCount / winningOption.Oys.Count) * 100) : (voteCount > 0 ? 100 : 0);
+                                        if (heightPercent == 0 && voteCount > 0) { heightPercent = 5; }
+                                        bool isWinner = (winningOption != null && secenek.SecenekId == winningOption.SecenekId && totalVotes > 0);
 
-                                <div class="flex flex-col flex-grow">
-                                    <div class="flex items-end justify-between gap-4 h-[300px] border-b border-dashed border-gray-300 dark:border-white/20 pb-2">
-                                        @for (int i = 0; i < secenekler.Count; i++)
-                                        {
-                                            var secenek = secenekler[i];
-                                            var oy = gosterilenOylar.ElementAtOrDefault(i);
-                                            int heightPercent = maxOy > 0 ? (int)Math.Round(oy * 100.0 / maxOy) : 0;
-
-                                            // SecenekId kullanıldı.
-                                            bool isWinnerBar = isFinished && winner != null && secenek.SecenekId == winner.Secenek.SecenekId;
-
-                                            <div class="flex flex-col items-center justify-end w-full h-full gap-2 relative">
-                                                @if (isWinnerBar && toplamOy > 0)
-                                                {
-                                                    <div class="absolute -top-11 flex flex-col items-center justify-center gap-1">
-                                                        <div class="rounded-full bg-primary px-2.5 py-1 text-xs font-bold uppercase text-background-dark shadow-lg shadow-primary/30">
-                                                            <span>KAZANAN</span>
-                                                        </div>
-                                                        <span class="material-symbols-outlined text-primary !text-2xl -mt-1">arrow_downward</span>
-                                                    </div>
-                                                }
-
-                                                <div class="text-sm font-semibold text-gray-800 dark:text-white">@oy</div>
-                                                <div class="w-full @(isWinnerBar ? "bg-primary" : "bg-primary/20 dark:bg-primary/40") rounded-t-md"
-                                                     style="height: @heightPercent%;"></div>
-                                            </div>
-                                        }
-                                    </div>
-
-                                    <div class="flex justify-between gap-4 pt-2">
-                                        @foreach (var secenek in secenekler)
-                                        {
-                                            <p class="text-center text-xs text-gray-500 dark:text-[#9db4b9] w-full">
-                                                @(secenek.SecenekText.Length > 12 ? secenek.SecenekText.Substring(0, 5) + "..." : secenek.SecenekText)
-                                            </p>
-                                        }
-                                    </div>
-
-                                    <div class="mt-auto pt-6 border-t border-gray-200 dark:border-white/10 flex items-center justify-between text-sm">
-                                        <p class="text-gray-600 dark:text-[#9db4b9]">Toplam Oy:</p>
-                                        <p class="text-gray-900 dark:text-white font-bold text-lg">@toplamOy</p>
-                                    </div>
+                                        <div class="flex flex-col items-center justify-end w-full h-full gap-2 relative">
+                                            @if (isWinner)
+                                            {
+                                                <div class="absolute -top-10 flex flex-col items-center animate-bounce">
+                                                    <span class="material-symbols-outlined text-primary">emoji_events</span>
+                                                </div>
+                                            }
+                                            <div class="text-sm font-semibold text-gray-800 dark:text-white">@voteCount</div>
+                                            <div class="w-full @(isWinner ? "bg-primary" : "bg-primary/30") rounded-t-md transition-all duration-500"
+                                                 style="height: @heightPercent.ToString("F0")%;"></div>
+                                        </div>
+                                    }
+                                </div>
+                                <div class="flex justify-between gap-4 pt-2">
+                                    @foreach (var secenek in orderedOptions)
+                                    {
+                                        <p class="text-center text-xs text-gray-500 dark:text-[#9db4b9] w-full truncate">@secenek.SecenekText</p>
+                                    }
+                                </div>
+                                <div class="mt-auto pt-6 border-t border-gray-200 dark:border-white/10 flex items-center justify-between text-sm">
+                                    <p class="text-gray-600 dark:text-[#9db4b9]">Toplam Oy:</p>
+                                    <p class="text-gray-900 dark:text-white font-bold text-lg">@totalVotes</p>
                                 </div>
                             </div>
-                        }
-                        else
-                        {
-                            <div class="bg-white/50 dark:bg-black/20 rounded-xl p-6 h-full flex flex-col justify-center">
-                                <h2 class="text-gray-900 dark:text-white text-[22px] font-bold leading-tight tracking-[-0.015em] mb-2">
-                                    Canlı Sonuçlar
-                                </h2>
-                                <p class="text-sm text-gray-600 dark:text-[#9db4b9]">
-                                    Henüz oy verilmedi veya anket seçenekleri yüklenemedi.
-                                </p>
-                            </div>
-                        }
+                        </div>
                     </div>
                 </div>
             </div>
         </main>
 
-        <footer class="sticky bottom-0 z-10 w-full mt-12">
-            <div class="bg-background-dark text-white py-3 px-4 shadow-[0_-4px_10px_rgba(0,0,0,0.1)]">
-                <div class="container mx-auto flex items-center justify-center gap-3 text-sm">
-                    <span class="material-symbols-outlined text-primary text-xl">timer</span>
-                    @if (!isFinished)
-                    {
-                        <p class="font-semibold text-base tracking-wide">
+        @if (Model.IsActive)
+        {
+            <footer class="sticky bottom-0 z-10 w-full mt-12">
+                <div class="bg-background-dark text-white py-3 px-4 shadow-[0_-4px_10px_rgba(0,0,0,0.1)]">
+                    <div class="container mx-auto flex items-center justify-center gap-3">
+                        <span class="material-symbols-outlined text-primary text-xl">timer</span>
+                        <p class="font-semibold text-base tracking-wide flex gap-2">
                             <span class="text-gray-400">Anketin bitmesine kalan süre:</span>
-                            <span class="text-white" id="countdown">hesaplanıyor...</span>
+                            <span id="countdown" class="text-white">Hesaplanıyor...</span>
                         </p>
-                    }
-                    else
-                    {
-                        <p class="font-semibold text-base tracking-wide">
-                            <span class="text-gray-400">Anket sona erdi.</span>
-                        </p>
-                    }
+                    </div>
                 </div>
-            </div>
-        </footer>
+            </footer>
+        }
     </div>
 
-    @if (!isFinished)
-    {
-        <script>
-            (function () {
-                const endTime = new Date('@Model.EndDate.ToString("yyyy-MM-ddTHH:mm:ss")');
-                const el = document.getElementById("countdown");
+    <div id="infoModal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 opacity-0 transition-opacity duration-300">
+        <div class="bg-white dark:bg-[#1a2835] rounded-2xl shadow-2xl max-w-md w-full transform scale-95 transition-transform duration-300" id="modalContent">
+            <div class="p-6">
+                <div class="flex justify-between items-start mb-4">
+                    <h3 class="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                        <span class="material-symbols-outlined text-primary">info</span>
+                        Etkinlik Bilgisi
+                    </h3>
+                    <button onclick="closeModal()" class="text-gray-400 hover:text-red-500 transition-colors">
+                        <span class="material-symbols-outlined">close</span>
+                    </button>
+                </div>
 
-                function updateCountdown() {
-                    const now = new Date();
-                    let diff = (endTime - now) / 1000;
+                <div class="space-y-4">
+                    <div>
+                        <p class="text-xs text-gray-500 uppercase font-bold tracking-wider">Etkinlik Adı</p>
+                        <p class="text-lg text-gray-800 dark:text-gray-200 font-medium">@Model.Title</p>
+                    </div>
 
-                    if (diff <= 0) {
-                        el.textContent = "Sona Erdi";
-                        return;
-                    }
+                    <div>
+                        <p class="text-xs text-gray-500 uppercase font-bold tracking-wider">Açıklama</p>
+                        <div class="text-base text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-black/20 p-3 rounded-lg mt-1 border border-gray-100 dark:border-gray-700">
+                            @Model.Description
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-gray-50 dark:bg-black/20 px-6 py-4 rounded-b-2xl flex justify-end">
+                <button onclick="closeModal()" class="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white rounded-lg font-medium hover:bg-gray-300 transition-colors">
+                    Tamam
+                </button>
+            </div>
+        </div>
+    </div>
 
-                    const d = Math.floor(diff / (3600 * 24));
-                    diff -= d * 3600 * 24;
-                    const h = Math.floor(diff / 3600);
-                    diff -= h * 3600;
-                    const m = Math.floor(diff / 60);
-                    const s = Math.floor(diff % 60);
+    <script>
+        // DÜZELTME: Argüman adını 'e' yaptık
+        function openModal(e) {
+            if(e) e.preventDefault();
+            const modal = document.getElementById('infoModal');
+            const content = document.getElementById('modalContent');
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                content.classList.remove('scale-95');
+                content.classList.add('scale-100');
+            }, 10);
+        }
 
-                    let output = "";
-                    if (d > 0) {
-                        output += `${d} gün, `;
-                    }
+        function closeModal() {
+            const modal = document.getElementById('infoModal');
+            const content = document.getElementById('modalContent');
+            modal.classList.add('opacity-0');
+            content.classList.remove('scale-100');
+            content.classList.add('scale-95');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 300);
+        }
 
-                    output += String(h).padStart(2, '0') + ":" +
-                              String(m).padStart(2, '0') + ":" +
-                              String(s).padStart(2, '0');
+        document.getElementById('infoModal').addEventListener('click', function(e) {
+            if (e.target === this) closeModal();
+        });
 
-                    el.textContent = output;
-                }
-
-                if (el) {
-                    updateCountdown();
-                    setInterval(updateCountdown, 1000);
-                }
-            })();
-        </script>
-    }
+        var countDownDate = new Date("@Model.EndDate.ToString("yyyy-MM-ddTHH:mm:ss")").getTime();
+        var x = setInterval(function() {
+            var now = new Date().getTime();
+            var distance = countDownDate - now;
+            if (distance < 0) {
+                clearInterval(x);
+                document.getElementById("countdown").innerHTML = "SÜRE DOLDU";
+                return;
+            }
+            var days = Math.floor(distance / (1000 * 60 * 60 * 24));
+            var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+            document.getElementById("countdown").innerHTML = days + "g " + hours + "s " + minutes + "d " + seconds + "sn ";
+        }, 1000);
+    </script>
 </body>
-</html>

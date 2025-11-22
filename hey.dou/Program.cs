@@ -14,6 +14,7 @@ builder.Services.AddDbContext<HeydouContext>(options =>
 
 // 3. Controller'larý ve Swagger'ý ekle
 builder.Services.AddControllersWithViews();
+builder.Services.AddSession(); // Session servisini ekle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
@@ -27,6 +28,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseSession(); // Session'ý aktif et
 
 app.UseAuthorization();
 

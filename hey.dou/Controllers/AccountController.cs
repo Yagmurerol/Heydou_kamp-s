@@ -1,14 +1,13 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using hey.dou.Models; // HeydouContext ve Kullanici modellerinin olduğu yer
-using System.Linq;
+using hey.dou.Models; // Modellerin ve Context'in olduğu yer
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http; // Session işlemleri için gerekli
 
 namespace hey.dou.Controllers
 {
     public class AccountController : Controller
     {
-        // 1. Veritabanı köprüsünü (HeydouContext) çağır
         private readonly HeydouContext _context;
 
         public AccountController(HeydouContext context)
@@ -16,43 +15,46 @@ namespace hey.dou.Controllers
             _context = context;
         }
 
-        // 2. /account/login adresine gidilince bu metot çalışır
+        // 1. Login Sayfasını Göster
         [HttpGet]
         public IActionResult Login()
         {
-            return View(); // Views/Account/Login.cshtml'i gösterir
+            return View();
         }
 
-        // 3. ÖĞRENCİ GİRİŞ Formu bu metodu tetikler
+        // 2. ÖĞRENCİ GİRİŞİ
         [HttpPost]
         public async Task<IActionResult> StudentLogin(string email, string password)
         {
             if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password))
             {
                 ViewBag.Error = "E-posta ve şifre boş bırakılamaz.";
-                return View("Login"); // Hata mesajıyla Login sayfasını geri göster
+                return View("Login");
             }
 
-            // Veritabanında eşleşen öğrenciyi ara
-            // 'Kullanicilar' adının HeydouContext.cs dosyanızda tanımlı olduğunu varsayıyoruz
+            // Veritabanında eşleşen öğrenciyi bul
             var kullanici = await _context.Kullanicilar.FirstOrDefaultAsync(k =>
                 k.Email == email &&
                 k.Sifre == password &&
-                k.Rol == "Ogrenci"); // Rol'ün DB'de "Ogrenci" yazdığını varsayıyorum
+                k.Rol == "Ogrenci");
 
             if (kullanici == null)
             {
-                // Eşleşme bulunamazsa
                 ViewBag.Error = "E-posta veya şifre hatalı.";
-                return View("Login"); // Hata mesajıyla Login sayfasını geri göster
+                return View("Login");
             }
 
-            // GİRİŞ BAŞARILI!
-            // Kullanıcıyı Dashboard'a (HomeController'ın Index'ine) yönlendir.
+            // --- Kullanıcıyı Hafızaya (Session) At ---
+            HttpContext.Session.SetInt32("UserId", kullanici.KullaniciId);
+            HttpContext.Session.SetString("AdSoyad", kullanici.AdSoyad ?? "Öğrenci");
+            HttpContext.Session.SetString("Rol", "Ogrenci");
+            // -----------------------------------------
+
+            // Başarılı giriş -> Ana Sayfaya yönlendir
             return RedirectToAction("Index", "Home");
         }
 
-        // 4. PERSONEL GİRİŞ Formu bu metodu tetikler
+        // 3. PERSONEL GİRİŞİ
         [HttpPost]
         public async Task<IActionResult> StaffLogin(string email, string password)
         {
@@ -62,11 +64,11 @@ namespace hey.dou.Controllers
                 return View("Login");
             }
 
-            // Veritabanında eşleşen personeli ara
+            // Veritabanında eşleşen personeli bul (Rolü Ogrenci olmayanlar)
             var kullanici = await _context.Kullanicilar.FirstOrDefaultAsync(k =>
                 k.Email == email &&
                 k.Sifre == password &&
-                (k.Rol != "Ogrenci")); // Rol'ü "Ogrenci" olmayan herkes (Personel, Admin vb.)
+                (k.Rol != "Ogrenci"));
 
             if (kullanici == null)
             {
@@ -74,9 +76,21 @@ namespace hey.dou.Controllers
                 return View("Login");
             }
 
-            // GİRİŞ BAŞARILI!
-            // Kullanıcıyı Dashboard'a (HomeController'ın Index'ine) yönlendir.
+            // --- Kullanıcıyı Hafızaya (Session) At ---
+            HttpContext.Session.SetInt32("UserId", kullanici.KullaniciId);
+            HttpContext.Session.SetString("AdSoyad", kullanici.AdSoyad ?? "Personel");
+            HttpContext.Session.SetString("Rol", kullanici.Rol ?? "Personel");
+            // -----------------------------------------
+
+            // Başarılı giriş -> Ana Sayfaya yönlendir
             return RedirectToAction("Index", "Home");
         }
+
+        // 4. ÇIKIŞ YAP (Logout)
+        public IActionResult Logout()
+        {
+            HttpContext.Session.Clear(); // Hafızayı temizle
+            return RedirectToAction("Login");
+        }
     }
-} // <-- 82. SATIRDAKİ HATA MUHTEMELEN BU PARANTEZİN EKSİKLİĞİYDİ
+}

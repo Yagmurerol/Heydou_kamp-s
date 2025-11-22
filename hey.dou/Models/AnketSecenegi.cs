@@ -7,16 +7,13 @@ namespace hey.dou.Models
     public partial class AnketSecenegi
     {
         [Key]
-        // DÜZELTME: SecenekID -> SecenekId
-        public int SecenekId { get; set; }
+        public int SecenekId { get; set; } // Küçük 'd'
 
         [Required]
         public string SecenekText { get; set; } = null!;
 
-        // DÜZELTME: AnketID -> AnketId
-        public int AnketId { get; set; }
+        public int AnketId { get; set; } // Küçük 'd'
 
-        // DÜZELTME: AnketID -> AnketId
         [ForeignKey("AnketId")]
         public virtual Anket Anket { get; set; } = null!;
 
