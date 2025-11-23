@@ -5,7 +5,7 @@ using hey.dou.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
-using Microsoft.AspNetCore.Http; // Session işlemleri için
+using Microsoft.AspNetCore.Http; // Session işlemleri için şart
 
 namespace hey.dou.Controllers
 {
@@ -18,7 +18,16 @@ namespace hey.dou.Controllers
             _context = context;
         }
 
-        // Yardımcı metot: En son anketi getir
+        // Yardımcı metot 1: Aktif, süresi dolmamış anketi getirir
+        private async Task<Anket?> GetActivePollAsync()
+        {
+            return await _context.Ankets
+                .Where(a => a.IsActive && a.EndDate > DateTime.Now)
+                .OrderByDescending(a => a.AnketId)
+                .FirstOrDefaultAsync();
+        }
+
+        // Yardımcı metot 2: En son anketi getir (detaylar için)
         private async Task<Anket?> GetCurrentPollAsync()
         {
             return await _context.Ankets
@@ -28,74 +37,126 @@ namespace hey.dou.Controllers
                 .FirstOrDefaultAsync();
         }
 
-        // 1. YENİ ANKET OLUŞTURMA (Sayfa)
-        public IActionResult Create()
+        // === 1. GİRİŞ KAPISI / LİSTELEME (Index) - TEK METHOD ===
+        // Bu metot, Öğrenciyi direkt Details'a, Başkanı liste/oluşturma sayfasına yönlendirir.
+        public async Task<IActionResult> Index()
         {
-            // Giriş Kontrolü
-            if (HttpContext.Session.GetInt32("UserId") == null)
+            // Giriş kontrolü
+            if (HttpContext.Session.GetInt32("UserId") == null) return RedirectToAction("Login", "Account");
+
+            var userRole = HttpContext.Session.GetString("Rol");
+            var activePoll = await GetActivePollAsync();
+
+            // 1. ÖĞRENCİ İSE VE ANKET VARSA DİREKT OYLAMA EKRANINA AT
+            if (userRole != "KulupBaskani" && activePoll != null)
             {
-                return RedirectToAction("Login", "Account");
+                return RedirectToAction(nameof(Details), new { id = activePoll.AnketId });
             }
 
+            // 2. KULÜP BAŞKANI İSE VEYA ANKET YOKSA LİSTEYİ GÖSTER
+            var anketler = await _context.Ankets.OrderByDescending(a => a.AnketId).ToListAsync();
+
+            // Eğer öğrenci ise ve anket yoksa hata mesajı ver
+            if (userRole != "KulupBaskani" && anketler.Count == 0)
+            {
+                TempData["Info"] = "Şu anda oy verebileceğiniz aktif bir anket bulunmamaktadır.";
+            }
+
+            return View(anketler);
+        }
+
+        // === 2. KULÜP BAŞKANI: SEÇENEK EKLEME SAYFASI (Create - GET) ===
+        public async Task<IActionResult> Create()
+        {
+            // Giriş ve Yetki Kontrolü
+            var userIdFromSession = HttpContext.Session.GetInt32("UserId");
+            if (HttpContext.Session.GetString("Rol") != "KulupBaskani" || userIdFromSession == null)
+            {
+                TempData["Error"] = "Bu sayfaya sadece Kulüp Başkanları etkinlik ekleyebilir.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            var activePoll = await GetActivePollAsync();
+
+            if (activePoll == null)
+            {
+                TempData["Error"] = "Şu anda oy verme süresi aktif olan bir ana anket bulunmamaktadır.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            // Kısıtlama Kontrolü
+            string currentUserID = userIdFromSession.Value.ToString();
+            bool alreadyProposed = await _context.AnketSecenegis
+                .AnyAsync(s => s.AnketId == activePoll.AnketId && s.CreatorKullaniciId == currentUserID);
+
+            if (alreadyProposed)
+            {
+                TempData["Info"] = "Öneriniz zaten kaydedilmiştir. Oylama ekranına yönlendiriliyorsunuz.";
+                return RedirectToAction(nameof(Details), new { id = activePoll.AnketId });
+            }
+
+            ViewBag.ActivePollId = activePoll.AnketId;
             return View();
         }
 
-        // 2. YENİ ANKET KAYDETME (İşlem)
+        // === 3. SEÇENEK KAYDETME İŞLEMİ (Create - POST) ===
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Title,Description")] Anket anket)
+        public async Task<IActionResult> Create(int activePollId, string proposedTitle)
         {
-            // Giriş Kontrolü
-            if (HttpContext.Session.GetInt32("UserId") == null) return RedirectToAction("Login", "Account");
+            // Güvenlik Kontrolü
+            var userIdFromSession = HttpContext.Session.GetInt32("UserId");
+            if (HttpContext.Session.GetString("Rol") != "KulupBaskani" || userIdFromSession == null) return RedirectToAction("Login", "Account");
 
-            if (string.IsNullOrWhiteSpace(anket.Title))
+            string currentUserID = userIdFromSession.Value.ToString();
+
+            if (string.IsNullOrWhiteSpace(proposedTitle))
             {
-                ModelState.AddModelError("Title", "Başlık alanı zorunludur.");
-                return View(anket);
+                TempData["Error"] = "Öneri başlığı boş bırakılamaz.";
+                ViewBag.ActivePollId = activePollId;
+                return View();
             }
 
-            // SÜRE AYARI: 1 Gün
-            anket.EndDate = DateTime.Now.AddDays(1);
-            anket.IsActive = true;
+            // Kısıtlama Kontrolü (Tekrar)
+            bool alreadyProposed = await _context.AnketSecenegis
+                .AnyAsync(s => s.AnketId == activePollId && s.CreatorKullaniciId == currentUserID);
 
-            _context.Ankets.Add(anket);
-            await _context.SaveChangesAsync();
-
-            var secenekler = new List<AnketSecenegi>();
-
-            // Başlığı seçenek olarak ekle
-            if (!string.IsNullOrWhiteSpace(anket.Title))
+            if (alreadyProposed)
             {
-                secenekler.Add(new AnketSecenegi { AnketId = anket.AnketId, SecenekText = anket.Title });
+                TempData["Error"] = "Bu ankete zaten bir etkinlik önerisi eklediniz.";
+                return RedirectToAction(nameof(Details), new { id = activePollId });
             }
 
-            // Diğer standart seçenekler
-            secenekler.Add(new AnketSecenegi { AnketId = anket.AnketId, SecenekText = "Hafta Sonu Doğa Yürüyüşü" });
-            secenekler.Add(new AnketSecenegi { AnketId = anket.AnketId, SecenekText = "Kutu Oyunu Gecesi" });
-            secenekler.Add(new AnketSecenegi { AnketId = anket.AnketId, SecenekText = "Topluluk Gönüllülük Günü" });
-            secenekler.Add(new AnketSecenegi { AnketId = anket.AnketId, SecenekText = "Kodlama Atölyesi" });
+            // Yeni seçeneği oluştur ve Creator ID'sini kaydet
+            var newOption = new AnketSecenegi
+            {
+                AnketId = activePollId,
+                SecenekText = proposedTitle,
+                CreatorKullaniciId = currentUserID
+            };
 
-            _context.AnketSecenegis.AddRange(secenekler);
+            _context.AnketSecenegis.Add(newOption);
             await _context.SaveChangesAsync();
 
-            return RedirectToAction(nameof(Details), new { id = anket.AnketId });
+            TempData["Success"] = $"Yeni etkinlik önerisi ('{proposedTitle}') başarıyla ankete eklendi!";
+
+            // BAŞARILI YÖNLENDİRME
+            return RedirectToAction(nameof(Details), new { id = activePollId });
         }
 
-        // 3. ANKET DETAYI / OYLAMA
+
+        // === 4. ANKET DETAYI / OYLAMA (Details) ===
         public async Task<IActionResult> Details(int? id)
         {
-            // --- GİRİŞ KONTROLÜ ---
+            // Giriş Kontrolü
             var userIdFromSession = HttpContext.Session.GetInt32("UserId");
-            if (userIdFromSession == null)
-            {
-                return RedirectToAction("Login", "Account");
-            }
-            // Oy.cs modelin KullaniciId'yi string istiyor, çeviriyoruz.
-            string currentUserID = userIdFromSession.Value.ToString();
-            // ----------------------
+            if (userIdFromSession == null) return RedirectToAction("Login", "Account");
 
+            string currentUserID = userIdFromSession.Value.ToString();
+
+            // Anket yüklemesi
             var anket = (id == null)
-                ? await GetCurrentPollAsync()
+                ? await GetActivePollAsync()
                 : await _context.Ankets
                             .Include(a => a.AnketSecenegis)
                             .ThenInclude(s => s.Oys)
@@ -103,27 +164,26 @@ namespace hey.dou.Controllers
 
             if (anket == null)
             {
-                return RedirectToAction(nameof(Create));
+                return RedirectToAction(nameof(Index));
             }
 
-            // Bu kullanıcı bu ankete daha önce oy vermiş mi?
+            // Oy kontrolü
             ViewBag.HasVoted = await _context.Oys
                 .AnyAsync(o => o.AnketId == anket.AnketId && o.KullaniciId == currentUserID);
 
             return View(anket);
         }
 
-        // 4. OY VERME İŞLEMİ
+        // === 5. OY VERME İŞLEMİ (Vote) ===
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Vote(int anketId, int secenekId)
         {
-            // --- GİRİŞ KONTROLÜ ---
+            // Güvenlik Kontrolü
             var userIdFromSession = HttpContext.Session.GetInt32("UserId");
             if (userIdFromSession == null) return RedirectToAction("Login", "Account");
 
             string currentUserID = userIdFromSession.Value.ToString();
-            // ----------------------
 
             var anket = await _context.Ankets.FindAsync(anketId);
 
@@ -146,7 +206,7 @@ namespace hey.dou.Controllers
             {
                 AnketId = anketId,
                 SecenekId = secenekId,
-                KullaniciId = currentUserID // Gerçek giriş yapan kişinin ID'si
+                KullaniciId = currentUserID
             };
 
             _context.Oys.Add(oy);
@@ -156,14 +216,7 @@ namespace hey.dou.Controllers
             return RedirectToAction(nameof(Details), new { id = anketId });
         }
 
-        // 5. LİSTELEME
-        public async Task<IActionResult> Index()
-        {
-            // Giriş kontrolü
-            if (HttpContext.Session.GetInt32("UserId") == null) return RedirectToAction("Login", "Account");
-
-            var anketler = await _context.Ankets.OrderByDescending(a => a.AnketId).ToListAsync();
-            return View(anketler);
-        }
+        // === 6. LİSTELEME (Index) - Artık ana giriş kapısı değil ===
+        
     }
 }

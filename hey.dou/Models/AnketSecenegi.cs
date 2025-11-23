@@ -13,6 +13,8 @@ namespace hey.dou.Models
         public string SecenekText { get; set; } = null!;
 
         public int AnketId { get; set; } // Küçük 'd'
+                                         // Models/AnketSecenegi.cs dosyasına eklenecek
+        public string? CreatorKullaniciId { get; set; }
 
         [ForeignKey("AnketId")]
         public virtual Anket Anket { get; set; } = null!;

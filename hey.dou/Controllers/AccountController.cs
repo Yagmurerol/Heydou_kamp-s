@@ -22,7 +22,7 @@ namespace hey.dou.Controllers
             return View();
         }
 
-        // 2. ÖĞRENCİ GİRİŞİ
+        // 2. ÖĞRENCİ GİRİŞİ (Kulüp Başkanı da buradan girecek)
         [HttpPost]
         public async Task<IActionResult> StudentLogin(string email, string password)
         {
@@ -32,22 +32,25 @@ namespace hey.dou.Controllers
                 return View("Login");
             }
 
-            // Veritabanında eşleşen öğrenciyi bul
+            // DÜZELTME: Rolü 'Ogrenci' OLANLAR VEYA 'KulupBaskani' OLANLAR giriş yapabilir
             var kullanici = await _context.Kullanicilar.FirstOrDefaultAsync(k =>
                 k.Email == email &&
                 k.Sifre == password &&
-                k.Rol == "Ogrenci");
+                (k.Rol == "Ogrenci" || k.Rol == "KulupBaskani"));
 
             if (kullanici == null)
             {
-                ViewBag.Error = "E-posta veya şifre hatalı.";
+                ViewBag.Error = "E-posta, şifre hatalı veya yetkiniz yok.";
                 return View("Login");
             }
 
             // --- Kullanıcıyı Hafızaya (Session) At ---
             HttpContext.Session.SetInt32("UserId", kullanici.KullaniciId);
             HttpContext.Session.SetString("AdSoyad", kullanici.AdSoyad ?? "Öğrenci");
-            HttpContext.Session.SetString("Rol", "Ogrenci");
+
+            // ÖNEMLİ: "Ogrenci" diye elle yazmıyoruz, veritabanındaki gerçek rolü (KulupBaskani ise onu) kaydediyoruz.
+            // Bu sayede AnketController kimin başkan olduğunu anlayacak.
+            HttpContext.Session.SetString("Rol", kullanici.Rol ?? "Ogrenci");
             // -----------------------------------------
 
             // Başarılı giriş -> Ana Sayfaya yönlendir
@@ -64,11 +67,11 @@ namespace hey.dou.Controllers
                 return View("Login");
             }
 
-            // Veritabanında eşleşen personeli bul (Rolü Ogrenci olmayanlar)
+            // Personel girişi (Öğrenci ve Başkan olmayanlar)
             var kullanici = await _context.Kullanicilar.FirstOrDefaultAsync(k =>
                 k.Email == email &&
                 k.Sifre == password &&
-                (k.Rol != "Ogrenci"));
+                (k.Rol != "Ogrenci" && k.Rol != "KulupBaskani"));
 
             if (kullanici == null)
             {

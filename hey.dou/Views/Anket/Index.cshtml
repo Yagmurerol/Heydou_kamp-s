@@ -1,44 +1,51 @@
-﻿@model IEnumerable<hey.dou.Models.Anket>
-
+﻿@* Bu dosya model almaz, veriyi ViewBag'den çeker *@
 @{
-    ViewData["Title"] = "Kulüp Etkinliği Anketleri";
+    ViewData["Title"] = "Yeni Etkinlik Önerisi Ekle";
+    // Controller, aktif anketin ID'sini ViewBag ile gönderir.
+    var activePollId = ViewBag.ActivePollId;
+    var errorMessage = TempData["Error"];
 }
 
-<div class="container mt-4">
-    <h2>@ViewData["Title"]</h2>
+<div class="max-w-2xl mx-auto px-4 py-8">
+    <div class="bg-white dark:bg-[#1a2835] shadow sm:rounded-lg overflow-hidden">
 
-    <p class="text-muted">
-        Aktif anketlerden birini seçip oy verebilirsiniz.
-    </p>
+        <div class="px-4 py-5 sm:px-6 border-b border-gray-200 dark:border-gray-700">
+            <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-white">@ViewData["Title"]</h3>
+            <p class="mt-1 text-sm text-gray-500">Öneriniz, şu an aktif olan ankete (ID: @activePollId) seçenek olarak eklenecektir.</p>
+        </div>
 
-    @if (!Model.Any())
-    {
-        <p>Şu anda oy verebileceğiniz aktif bir anket bulunmuyor.</p>
-    }
-    else
-    {
-        <table class="table table-hover">
-            <thead>
-                <tr>
-                    <th>Başlık</th>
-                    <th>Bitiş Tarihi</th>
-                    <th></th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var anket in Model)
-                {
-                    <tr>
-                        <td>@anket.Title</td>
-                        <td>@anket.EndDate.ToString("dd.MM.yyyy HH:mm")</td>
-                        <td>
-                            <a asp-action="Poll" asp-route-id="@anket.AnketId" class="btn btn-primary btn-sm">
-                                Oy Ver / Sonuçları Gör
-                            </a>
-                        </td>
-                    </tr>
-                }
-            </tbody>
-        </table>
-    }
+        <div class="px-4 py-5 sm:p-6">
+
+            @if (errorMessage != null)
+            {
+                <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-4" role="alert">
+                    <p class="font-bold">Hata:</p>
+                    <p>@errorMessage</p>
+                </div>
+            }
+
+            <form asp-action="Create" method="post" class="space-y-6">
+
+                <input type="hidden" name="activePollId" value="@activePollId" />
+
+                <div>
+                    <label for="proposedTitle" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Önerilen Etkinlik Başlığı</label>
+                    <div class="mt-1">
+                        <input name="proposedTitle"
+                               class="appearance-none block w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm bg-white dark:bg-gray-800"
+                               required />
+                    </div>
+                </div>
+
+                <div class="flex justify-end gap-3">
+                    <a asp-action="Index" class="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700">
+                        İptal
+                    </a>
+                    <button type="submit" class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                        Öneriyi Ekle
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
 </div>
