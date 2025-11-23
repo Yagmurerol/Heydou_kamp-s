@@ -12,36 +12,62 @@
         </p>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 max-w-5xl mx-auto">
 
-        <a asp-controller="Yemekhane" asp-action="Index" class="block p-6 bg-card-light dark:bg-card-dark rounded-xl shadow-lg hover:shadow-2xl transition-shadow duration-300">
+        <!-- YEMEKHANE -->
+        <a asp-controller="Yemekhane" asp-action="Index"
+           class="block p-6 bg-card-light dark:bg-card-dark rounded-xl shadow-lg hover:shadow-2xl transition-shadow duration-300">
             <div class="flex items-center justify-center bg-primary/10 dark:bg-primary/20 rounded-full h-16 w-16 mb-4">
                 <span class="material-symbols-outlined text-4xl text-primary">
                     restaurant_menu
                 </span>
             </div>
             <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">Yemekhane</h3>
-            <p class="text-gray-500 dark:text-gray-400">Haftalık yemek menülerini ve kalori bilgilerini görüntüleyin.</p>
+            <p class="text-gray-500 dark:text-gray-400">
+                Haftalık yemek menülerini ve kalori bilgilerini görüntüleyin.
+            </p>
         </a>
 
-        <a asp-controller="AkademikTakvim" asp-action="Index" class="block p-6 bg-card-light dark:bg-card-dark rounded-xl shadow-lg hover:shadow-2xl transition-shadow duration-300">
+        <!-- AKADEMİK TAKVİM -->
+        <a asp-controller="AkademikTakvim" asp-action="Index"
+           class="block p-6 bg-card-light dark:bg-card-dark rounded-xl shadow-lg hover:shadow-2xl transition-shadow duration-300">
             <div class="flex items-center justify-center bg-primary/10 dark:bg-primary/20 rounded-full h-16 w-16 mb-4">
                 <span class="material-symbols-outlined text-4xl text-primary">
                     calendar_month
                 </span>
             </div>
             <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">Akademik Takvim</h3>
-            <p class="text-gray-500 dark:text-gray-400">Sınav tarihlerini, tatilleri ve önemli etkinlikleri takip edin.</p>
+            <p class="text-gray-500 dark:text-gray-400">
+                Sınav tarihlerini, tatilleri ve önemli etkinlikleri takip edin.
+            </p>
         </a>
 
-        <a asp-controller="Anket" asp-action="Create" class="block p-6 bg-card-light dark:bg-card-dark rounded-xl shadow-lg hover:shadow-2xl transition-shadow duration-300">
+        <!-- ANKETLER -->
+        <a asp-controller="Anket" asp-action="Create"
+           class="block p-6 bg-card-light dark:bg-card-dark rounded-xl shadow-lg hover:shadow-2xl transition-shadow duration-300">
             <div class="flex items-center justify-center bg-primary/10 dark:bg-primary/20 rounded-full h-16 w-16 mb-4">
                 <span class="material-symbols-outlined text-4xl text-primary">
                     poll
                 </span>
             </div>
             <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">Anketler</h3>
-            <p class="text-gray-500 dark:text-gray-400">Aktif anketlere katılın ve kulüp etkinliklerine yön verin.</p>
+            <p class="text-gray-500 dark:text-gray-400">
+                Aktif anketlere katılın ve kulüp etkinliklerine yön verin.
+            </p>
+        </a>
+
+        <!-- 🧠 AI DANIŞMAN (YENİ KART) -->
+        <a asp-controller="AiDanisman" asp-action="Index"
+           class="block p-6 bg-card-light dark:bg-card-dark rounded-xl shadow-lg hover:shadow-2xl transition-shadow duration-300">
+            <div class="flex items-center justify-center bg-primary/10 dark:bg-primary/20 rounded-full h-16 w-16 mb-4">
+                <span class="material-symbols-outlined text-4xl text-primary">
+                    smart_toy
+                </span>
+            </div>
+            <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">AI Danışman</h3>
+            <p class="text-gray-500 dark:text-gray-400">
+                Öğrenci danışmanına soru sor, AI destekli cevap ve yönlendirme al.
+            </p>
         </a>
 
     </div>
