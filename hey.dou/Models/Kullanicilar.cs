@@ -1,12 +1,13 @@
-﻿using System.ComponentModel.DataAnnotations; // 1. BU SATIR EKLENDİ (veya eksikti)
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace hey.dou.Models
 {
     public class Kullanici
     {
-        [Key] // 2. BU SATIR EKLENDİ (Bu, KullaniciId'nin anahtar olduğunu belirtir)
+        [Key]
         public int KullaniciId { get; set; }
 
+        // Soru işaretleri (?) ekleyerek uyarıları susturuyoruz
         public string? AdSoyad { get; set; }
         public string? Email { get; set; }
         public string? Sifre { get; set; }

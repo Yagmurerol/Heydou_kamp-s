@@ -1,47 +1,70 @@
-﻿@* Not: Bu View Model almaz, veriyi ViewBag'den çeker *@
+﻿@model hey.dou.Models.EtkinlikCreateViewModel
 @{
-    ViewData["Title"] = "Yeni Etkinlik Önerisi Ekle";
-    var activePollId = ViewBag.ActivePollId;
-    var errorMessage = TempData["Error"];
+    ViewData["Title"] = "Yeni Etkinlik Oluştur";
 }
 
 <div class="max-w-2xl mx-auto px-4 py-8">
-    <div class="bg-white dark:bg-[#1a2835] shadow sm:rounded-lg overflow-hidden">
+    <div class="bg-white dark:bg-[#1a2835] shadow-xl sm:rounded-2xl overflow-hidden border border-gray-100 dark:border-gray-700">
 
-        <div class="px-4 py-5 sm:px-6 border-b border-gray-200 dark:border-gray-700">
-            <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-white">@ViewData["Title"]</h3>
-            <p class="mt-1 text-sm text-gray-500">Öneriniz, şu an aktif olan ankete seçenek olarak eklenecektir.</p>
+        <div class="px-6 py-6 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
+            <h3 class="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                <span class="material-symbols-outlined text-primary">add_circle</span>
+                @ViewData["Title"]
+            </h3>
+            <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Kulüp başkanı olarak yeni bir etkinlik oylaması başlatın.</p>
         </div>
 
-        <div class="px-4 py-5 sm:p-6">
+        <div class="px-6 py-6">
 
-            @if (errorMessage != null)
-            {
-                <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-4" role="alert">
-                    <p class="font-bold">Hata:</p>
-                    <p>@errorMessage</p>
-                </div>
-            }
+            <div asp-validation-summary="ModelOnly" class="mb-6 p-4 rounded-lg bg-red-50 border border-red-200 text-red-600 text-sm font-medium"></div>
 
             <form asp-action="Create" method="post" class="space-y-6">
 
-                <input type="hidden" name="activePollId" value="@activePollId" />
-
                 <div>
-                    <label for="proposedTitle" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Önerilen Etkinlik Başlığı</label>
-                    <div class="mt-1">
-                        <input name="proposedTitle"
-                               class="appearance-none block w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm bg-white dark:bg-gray-800"
-                               required />
-                    </div>
+                    <label asp-for="KulupAdi" class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1">Kulüp Adı</label>
+                    <input asp-for="KulupAdi" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary dark:bg-gray-800 dark:text-white transition-colors" placeholder="Örn: Edebiyat Kulübü" />
+                    <span asp-validation-for="KulupAdi" class="text-red-500 text-xs mt-1 block"></span>
                 </div>
 
-                <div class="flex justify-end gap-3">
-                    <a asp-action="Index" class="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700">
+                <div>
+                    <label asp-for="KulupBaskaniAdi" class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1">Kulüp Başkanı Adı</label>
+                    <input asp-for="KulupBaskaniAdi" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary dark:bg-gray-800 dark:text-white transition-colors" placeholder="Örn: Ad Soyad" />
+                    <span asp-validation-for="KulupBaskaniAdi" class="text-red-500 text-xs mt-1 block"></span>
+                </div>
+
+                <div>
+                    <label asp-for="EtkinlikAdi" class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1">Etkinlik Adı (Oylama Başlığı)</label>
+                    <input asp-for="EtkinlikAdi" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary dark:bg-gray-800 dark:text-white transition-colors" placeholder="Örn: Yıllık Kitap Fuarı" />
+                    <span asp-validation-for="EtkinlikAdi" class="text-red-500 text-xs mt-1 block"></span>
+                </div>
+
+                <div>
+                    <label asp-for="Konum" class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1">Etkinlik Konumu</label>
+                    <div class="relative">
+                        <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">location_on</span>
+                        <input asp-for="Konum" class="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary dark:bg-gray-800 dark:text-white transition-colors" placeholder="Örn: Konferans Salonu" />
+                    </div>
+                    <span asp-validation-for="Konum" class="text-red-500 text-xs mt-1 block"></span>
+                </div>
+
+                <div>
+                    <label asp-for="TarihSaat" class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1">Tarih ve Saat</label>
+                    <input asp-for="TarihSaat" type="datetime-local" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary dark:bg-gray-800 dark:text-white transition-colors" />
+                    <span asp-validation-for="TarihSaat" class="text-red-500 text-xs mt-1 block"></span>
+                </div>
+
+                <div>
+                    <label asp-for="KisaAciklama" class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1">Etkinlik Açıklaması</label>
+                    <textarea asp-for="KisaAciklama" rows="4" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary dark:bg-gray-800 dark:text-white transition-colors" placeholder="Etkinlik hakkında kısa bilgi verin..."></textarea>
+                    <span asp-validation-for="KisaAciklama" class="text-red-500 text-xs mt-1 block"></span>
+                </div>
+
+                <div class="flex items-center justify-end gap-3 pt-4 border-t border-gray-100 dark:border-gray-700">
+                    <a asp-action="Index" class="px-5 py-2.5 rounded-xl text-gray-700 dark:text-gray-300 font-medium hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
                         İptal
                     </a>
-                    <button type="submit" class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
-                        Öneriyi Ekle
+                    <button type="submit" class="px-6 py-2.5 bg-primary hover:bg-red-600 text-white rounded-xl font-bold shadow-lg shadow-primary/30 transition-all transform hover:-translate-y-0.5">
+                        Etkinliği Oluştur
                     </button>
                 </div>
             </form>

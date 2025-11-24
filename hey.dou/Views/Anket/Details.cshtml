@@ -18,12 +18,7 @@
                         <h1 class="text-gray-900 dark:text-white text-3xl md:text-4xl font-black leading-tight tracking-[-0.033em]">
                             Etkinlik Anketi
                         </h1>
-
-                        <button type="button" onclick="openModal(event)" class="text-gray-400 hover:text-primary transition-colors duration-200 focus:outline-none" title="Etkinlik Detaylarını Gör">
-                            <span class="material-symbols-outlined text-3xl">info</span>
-                        </button>
                     </div>
-
                     <p class="text-gray-500 dark:text-[#9db4b9] text-base font-normal leading-normal mt-2">
                         Aşağıdaki seçeneklerden birini oylayarak etkinliği belirleyin.
                     </p>
@@ -40,8 +35,6 @@
                             <div class="flex flex-col gap-3">
                                 @foreach (var secenek in orderedOptions)
                                 {
-                                    bool isCustomEvent = (secenek.SecenekText == Model.Title);
-
                                     <div class="relative group">
                                         <label class="flex items-center gap-4 rounded-lg border border-solid border-gray-200 dark:border-[#3b4f54] p-4 cursor-pointer hover:border-primary/50 transition-colors has-[:checked]:border-primary has-[:checked]:bg-primary/10 dark:has-[:checked]:bg-primary/20">
 
@@ -53,12 +46,16 @@
                                                     @secenek.SecenekText
                                                 </p>
 
-                                                @if (isCustomEvent)
-                                                {
-                                                    <button type="button" onclick="openModal(event)" class="text-primary hover:text-red-600 transition-colors p-1 rounded-full hover:bg-primary/10" title="Detayları Gör">
-                                                        <span class="material-symbols-outlined text-2xl">info</span>
-                                                    </button>
-                                                }
+                                                <button type="button"
+                                                        class="js-info-btn text-gray-400 hover:text-primary transition-colors p-1 rounded-full hover:bg-primary/10"
+                                                        data-title="@secenek.SecenekText"
+                                                        data-desc="@secenek.KisaAciklama"
+                                                        data-kulup="@secenek.KulupAdi"
+                                                        data-baskan="@secenek.KulupBaskaniAdi"
+                                                        data-konum="@secenek.Konum"
+                                                        data-tarih="@(secenek.TarihSaat.HasValue? secenek.TarihSaat.Value.ToString("dd MMMM HH:mm") : "")">
+                                                    <span class="material-symbols-outlined text-2xl">info</span>
+                                                </button>
                                             </div>
                                         </label>
                                     </div>
@@ -151,29 +148,47 @@
                 <div class="flex justify-between items-start mb-4">
                     <h3 class="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
                         <span class="material-symbols-outlined text-primary">info</span>
-                        Etkinlik Bilgisi
+                        Etkinlik Detayları
                     </h3>
-                    <button onclick="closeModal()" class="text-gray-400 hover:text-red-500 transition-colors">
+                    <button id="closeModalBtn" class="text-gray-400 hover:text-red-500 transition-colors">
                         <span class="material-symbols-outlined">close</span>
                     </button>
                 </div>
 
                 <div class="space-y-4">
                     <div>
-                        <p class="text-xs text-gray-500 uppercase font-bold tracking-wider">Etkinlik Adı</p>
-                        <p class="text-lg text-gray-800 dark:text-gray-200 font-medium">@Model.Title</p>
+                        <p class="text-xs text-gray-500 uppercase font-bold tracking-wider">Seçenek Adı</p>
+                        <p id="m-title" class="text-lg text-gray-800 dark:text-gray-200 font-medium"></p>
+                    </div>
+
+                    <div id="m-details-area" class="hidden space-y-3 bg-gray-50 dark:bg-black/20 p-4 rounded-xl border border-gray-100 dark:border-gray-700">
+                        <div>
+                            <span class="text-xs font-bold text-gray-500 uppercase">Kulüp:</span>
+                            <span id="m-kulup" class="ml-2 text-gray-800 dark:text-white font-medium"></span>
+                        </div>
+                        <div>
+                            <span class="text-xs font-bold text-gray-500 uppercase">Başkan:</span>
+                            <span id="m-baskan" class="ml-2 text-gray-800 dark:text-white font-medium"></span>
+                        </div>
+                        <div>
+                            <span class="text-xs font-bold text-gray-500 uppercase">Tarih:</span>
+                            <span id="m-tarih" class="ml-2 text-primary font-bold"></span>
+                        </div>
+                        <div>
+                            <span class="text-xs font-bold text-gray-500 uppercase">Konum:</span>
+                            <span id="m-konum" class="ml-2 text-gray-800 dark:text-white"></span>
+                        </div>
                     </div>
 
                     <div>
-                        <p class="text-xs text-gray-500 uppercase font-bold tracking-wider">Açıklama</p>
-                        <div class="text-base text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-black/20 p-3 rounded-lg mt-1 border border-gray-100 dark:border-gray-700">
-                            @Model.Description
+                        <p class="text-xs text-gray-500 uppercase font-bold tracking-wider mb-1">Açıklama</p>
+                        <div id="m-desc" class="text-base text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-black/20 p-3 rounded-lg border border-gray-100 dark:border-gray-700">
                         </div>
                     </div>
                 </div>
             </div>
             <div class="bg-gray-50 dark:bg-black/20 px-6 py-4 rounded-b-2xl flex justify-end">
-                <button onclick="closeModal()" class="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white rounded-lg font-medium hover:bg-gray-300 transition-colors">
+                <button id="closeModalBtn2" class="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white rounded-lg font-medium hover:bg-gray-300 transition-colors">
                     Tamam
                 </button>
             </div>
@@ -181,9 +196,56 @@
     </div>
 
     <script>
-        // DÜZELTME: Argüman adını 'e' yaptık
-        function openModal(e) {
-            if(e) e.preventDefault();
+        // Sayfa yüklendiğinde olay dinleyicilerini (Event Listeners) ekle
+        document.addEventListener('DOMContentLoaded', function() {
+
+            // Tüm bilgi butonlarını bul
+            const infoButtons = document.querySelectorAll('.js-info-btn');
+
+            // Hepsine tıklama olayı ekle
+            infoButtons.forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.preventDefault(); // Sayfa yenilenmesini engelle
+
+                    // Verileri butondan al
+                    const title = this.getAttribute('data-title');
+                    const desc = this.getAttribute('data-desc');
+                    const kulup = this.getAttribute('data-kulup');
+                    const baskan = this.getAttribute('data-baskan');
+                    const tarih = this.getAttribute('data-tarih');
+                    const konum = this.getAttribute('data-konum');
+
+                    // Modalı doldur
+                    document.getElementById('m-title').innerText = title;
+                    document.getElementById('m-desc').innerText = desc || "Bu seçenek için ek açıklama girilmemiştir.";
+
+                    const detailsArea = document.getElementById('m-details-area');
+                    if (kulup && kulup.trim() !== "") {
+                        detailsArea.classList.remove('hidden');
+                        document.getElementById('m-kulup').innerText = kulup;
+                        document.getElementById('m-baskan').innerText = baskan;
+                        document.getElementById('m-tarih').innerText = tarih;
+                        document.getElementById('m-konum').innerText = konum;
+                    } else {
+                        detailsArea.classList.add('hidden');
+                    }
+
+                    // Modalı göster
+                    showModal();
+                });
+            });
+
+            // Kapatma butonlarına olay ekle
+            document.getElementById('closeModalBtn').addEventListener('click', hideModal);
+            document.getElementById('closeModalBtn2').addEventListener('click', hideModal);
+
+            // Dışarı tıklayınca kapat
+            document.getElementById('infoModal').addEventListener('click', function(e) {
+                if (e.target === this) hideModal();
+            });
+        });
+
+        function showModal() {
             const modal = document.getElementById('infoModal');
             const content = document.getElementById('modalContent');
             modal.classList.remove('hidden');
@@ -194,7 +256,7 @@
             }, 10);
         }
 
-        function closeModal() {
+        function hideModal() {
             const modal = document.getElementById('infoModal');
             const content = document.getElementById('modalContent');
             modal.classList.add('opacity-0');
@@ -205,10 +267,7 @@
             }, 300);
         }
 
-        document.getElementById('infoModal').addEventListener('click', function(e) {
-            if (e.target === this) closeModal();
-        });
-
+        // Geri Sayım
         var countDownDate = new Date("@Model.EndDate.ToString("yyyy-MM-ddTHH:mm:ss")").getTime();
         var x = setInterval(function() {
             var now = new Date().getTime();

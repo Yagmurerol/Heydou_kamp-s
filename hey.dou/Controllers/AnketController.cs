@@ -5,7 +5,7 @@ using hey.dou.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
-using Microsoft.AspNetCore.Http; // Session işlemleri için şart
+using Microsoft.AspNetCore.Http;
 
 namespace hey.dou.Controllers
 {
@@ -18,7 +18,7 @@ namespace hey.dou.Controllers
             _context = context;
         }
 
-        // Yardımcı metot 1: Aktif, süresi dolmamış anketi getirir
+        // Yardımcı metot 1: Aktif anket
         private async Task<Anket?> GetActivePollAsync()
         {
             return await _context.Ankets
@@ -27,36 +27,31 @@ namespace hey.dou.Controllers
                 .FirstOrDefaultAsync();
         }
 
-        // Yardımcı metot 2: En son anketi getir (detaylar için)
-        private async Task<Anket?> GetCurrentPollAsync()
+        // Yardımcı metot 2: Detaylı anket
+        private async Task<Anket?> GetPollWithDetailsAsync(int id)
         {
             return await _context.Ankets
                 .Include(a => a.AnketSecenegis)
                     .ThenInclude(s => s.Oys)
-                .OrderByDescending(a => a.AnketId)
-                .FirstOrDefaultAsync();
+                .FirstOrDefaultAsync(m => m.AnketId == id);
         }
 
-        // === 1. GİRİŞ KAPISI / LİSTELEME (Index) - TEK METHOD ===
-        // Bu metot, Öğrenciyi direkt Details'a, Başkanı liste/oluşturma sayfasına yönlendirir.
+        // === 1. INDEX (YÖNLENDİRME) ===
         public async Task<IActionResult> Index()
         {
-            // Giriş kontrolü
             if (HttpContext.Session.GetInt32("UserId") == null) return RedirectToAction("Login", "Account");
 
             var userRole = HttpContext.Session.GetString("Rol");
             var activePoll = await GetActivePollAsync();
 
-            // 1. ÖĞRENCİ İSE VE ANKET VARSA DİREKT OYLAMA EKRANINA AT
+            // Öğrenciyi direkt oylamaya at
             if (userRole != "KulupBaskani" && activePoll != null)
             {
                 return RedirectToAction(nameof(Details), new { id = activePoll.AnketId });
             }
 
-            // 2. KULÜP BAŞKANI İSE VEYA ANKET YOKSA LİSTEYİ GÖSTER
             var anketler = await _context.Ankets.OrderByDescending(a => a.AnketId).ToListAsync();
 
-            // Eğer öğrenci ise ve anket yoksa hata mesajı ver
             if (userRole != "KulupBaskani" && anketler.Count == 0)
             {
                 TempData["Info"] = "Şu anda oy verebileceğiniz aktif bir anket bulunmamaktadır.";
@@ -65,124 +60,157 @@ namespace hey.dou.Controllers
             return View(anketler);
         }
 
-        // === 2. KULÜP BAŞKANI: SEÇENEK EKLEME SAYFASI (Create - GET) ===
-        public async Task<IActionResult> Create()
+        // === 2. CREATE (GET - SAYFA) ===
+        public IActionResult Create()
         {
-            // Giriş ve Yetki Kontrolü
             var userIdFromSession = HttpContext.Session.GetInt32("UserId");
             if (HttpContext.Session.GetString("Rol") != "KulupBaskani" || userIdFromSession == null)
             {
                 TempData["Error"] = "Bu sayfaya sadece Kulüp Başkanları etkinlik ekleyebilir.";
                 return RedirectToAction(nameof(Index));
             }
-
-            var activePoll = await GetActivePollAsync();
-
-            if (activePoll == null)
-            {
-                TempData["Error"] = "Şu anda oy verme süresi aktif olan bir ana anket bulunmamaktadır.";
-                return RedirectToAction(nameof(Index));
-            }
-
-            // Kısıtlama Kontrolü
-            string currentUserID = userIdFromSession.Value.ToString();
-            bool alreadyProposed = await _context.AnketSecenegis
-                .AnyAsync(s => s.AnketId == activePoll.AnketId && s.CreatorKullaniciId == currentUserID);
-
-            if (alreadyProposed)
-            {
-                TempData["Info"] = "Öneriniz zaten kaydedilmiştir. Oylama ekranına yönlendiriliyorsunuz.";
-                return RedirectToAction(nameof(Details), new { id = activePoll.AnketId });
-            }
-
-            ViewBag.ActivePollId = activePoll.AnketId;
-            return View();
+            return View(new EtkinlikCreateViewModel());
         }
 
-        // === 3. SEÇENEK KAYDETME İŞLEMİ (Create - POST) ===
+        // === 3. CREATE (POST - KAYDETME) ===
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(int activePollId, string proposedTitle)
+        public async Task<IActionResult> Create(EtkinlikCreateViewModel model)
         {
-            // Güvenlik Kontrolü
+            // Güvenlik
             var userIdFromSession = HttpContext.Session.GetInt32("UserId");
-            if (HttpContext.Session.GetString("Rol") != "KulupBaskani" || userIdFromSession == null) return RedirectToAction("Login", "Account");
+            if (HttpContext.Session.GetString("Rol") != "KulupBaskani" || userIdFromSession == null)
+                return RedirectToAction("Login", "Account");
 
             string currentUserID = userIdFromSession.Value.ToString();
 
-            if (string.IsNullOrWhiteSpace(proposedTitle))
+            if (!ModelState.IsValid)
             {
-                TempData["Error"] = "Öneri başlığı boş bırakılamaz.";
-                ViewBag.ActivePollId = activePollId;
-                return View();
+                return View(model);
             }
 
-            // Kısıtlama Kontrolü (Tekrar)
-            bool alreadyProposed = await _context.AnketSecenegis
-                .AnyAsync(s => s.AnketId == activePollId && s.CreatorKullaniciId == currentUserID);
+            // 1. Anketi Oluştur
+            string fullDescription = $"Kulüp: {model.KulupAdi} | Başkan: {model.KulupBaskaniAdi}";
 
-            if (alreadyProposed)
+            var yeniAnket = new Anket
             {
-                TempData["Error"] = "Bu ankete zaten bir etkinlik önerisi eklediniz.";
-                return RedirectToAction(nameof(Details), new { id = activePollId });
-            }
-
-            // Yeni seçeneği oluştur ve Creator ID'sini kaydet
-            var newOption = new AnketSecenegi
-            {
-                AnketId = activePollId,
-                SecenekText = proposedTitle,
-                CreatorKullaniciId = currentUserID
+                Title = model.EtkinlikAdi,
+                Description = fullDescription,
+                EndDate = DateTime.Now.AddDays(1),
+                IsActive = true
             };
 
-            _context.AnketSecenegis.Add(newOption);
+            _context.Ankets.Add(yeniAnket);
             await _context.SaveChangesAsync();
 
-            TempData["Success"] = $"Yeni etkinlik önerisi ('{proposedTitle}') başarıyla ankete eklendi!";
+            // 2. Seçenekleri Oluştur (BAŞKANIN EKLEDİĞİ + OTOMATİK EKELENENLER)
+            var secenekler = new List<AnketSecenegi>();
 
-            // BAŞARILI YÖNLENDİRME
-            return RedirectToAction(nameof(Details), new { id = activePollId });
+            // A) Başkanın Eklediği Özel Etkinlik
+            secenekler.Add(new AnketSecenegi
+            {
+                AnketId = yeniAnket.AnketId,
+                SecenekText = model.EtkinlikAdi,
+                CreatorKullaniciId = currentUserID,
+                KulupAdi = model.KulupAdi,
+                KulupBaskaniAdi = model.KulupBaskaniAdi,
+                Konum = model.Konum,
+                TarihSaat = model.TarihSaat,
+                KisaAciklama = model.KisaAciklama
+            });
+
+            // B) OTOMATİK EKLENEN ETKİNLİKLER (Dolu Bilgilerle)
+
+            // 1. Doğa Yürüyüşü
+            secenekler.Add(new AnketSecenegi
+            {
+                AnketId = yeniAnket.AnketId,
+                SecenekText = "Hafta Sonu Doğa Yürüyüşü",
+                KulupAdi = "Gezi ve Kampçılık Kulübü",
+                KulupBaskaniAdi = "Mert Demir",
+                Konum = "Belgrad Ormanı / Neşet Suyu",
+                TarihSaat = DateTime.Now.AddDays(3).AddHours(9), // 3 gün sonra sabah 9
+                KisaAciklama = "Doğayla iç içe, oksijen dolu harika bir yürüyüş etkinliği. Spor ayakkabılarınızı ve suyunuzu getirmeyi unutmayın. Servis kampüsten kalkacaktır."
+            });
+
+            // 2. Kutu Oyunu Gecesi
+            secenekler.Add(new AnketSecenegi
+            {
+                AnketId = yeniAnket.AnketId,
+                SecenekText = "Kutu Oyunu Gecesi",
+                KulupAdi = "Oyun ve Strateji Kulübü",
+                KulupBaskaniAdi = "Zeynep Kaya",
+                Konum = "Kampüs Kafeterya",
+                TarihSaat = DateTime.Now.AddDays(2).AddHours(18), // 2 gün sonra akşam 6
+                KisaAciklama = "Catan, Monopoly, Tabu ve daha fazlası! Stratejini konuştur, eğlenceli bir rekabet gecesi seni bekliyor. Atıştırmalıklar bizden!"
+            });
+
+            // 3. Topluluk Gönüllülük Günü
+            secenekler.Add(new AnketSecenegi
+            {
+                AnketId = yeniAnket.AnketId,
+                SecenekText = "Topluluk Gönüllülük Günü",
+                KulupAdi = "Sosyal Sorumluluk Kulübü",
+                KulupBaskaniAdi = "Elif Yılmaz",
+                Konum = "Merkez Kampüs Meydanı",
+                TarihSaat = DateTime.Now.AddDays(5).AddHours(13),
+                KisaAciklama = "Birlikten kuvvet doğar! Çevre temizliği ve sokak hayvanları için mama dağıtımı yapacağız. Hep birlikte dünyayı güzelleştirelim."
+            });
+
+            // 4. Kodlama Atölyesi
+            secenekler.Add(new AnketSecenegi
+            {
+                AnketId = yeniAnket.AnketId,
+                SecenekText = "Kodlama Atölyesi",
+                KulupAdi = "Yazılım ve İnovasyon Kulübü",
+                KulupBaskaniAdi = "Burak Çelik",
+                Konum = "Bilgisayar Lab. B Blok",
+                TarihSaat = DateTime.Now.AddDays(4).AddHours(15),
+                KisaAciklama = "Python ile Veri Analizine Giriş. Hiç bilmeyenler için temel seviyeden başlayacağız. Kendi laptopunuzu getirmeyi unutmayın."
+            });
+
+            _context.AnketSecenegis.AddRange(secenekler);
+            await _context.SaveChangesAsync();
+
+            TempData["Success"] = "Etkinlik anketi başarıyla başlatıldı!";
+            return RedirectToAction(nameof(Details), new { id = yeniAnket.AnketId });
         }
 
 
-        // === 4. ANKET DETAYI / OYLAMA (Details) ===
+        // === 4. DETAILS / OYLAMA ===
         public async Task<IActionResult> Details(int? id)
         {
-            // Giriş Kontrolü
             var userIdFromSession = HttpContext.Session.GetInt32("UserId");
             if (userIdFromSession == null) return RedirectToAction("Login", "Account");
-
             string currentUserID = userIdFromSession.Value.ToString();
 
-            // Anket yüklemesi
-            var anket = (id == null)
-                ? await GetActivePollAsync()
-                : await _context.Ankets
-                            .Include(a => a.AnketSecenegis)
-                            .ThenInclude(s => s.Oys)
-                            .FirstOrDefaultAsync(m => m.AnketId == id);
+            Anket? anket;
 
-            if (anket == null)
+            if (id == null)
             {
-                return RedirectToAction(nameof(Index));
+                anket = await GetActivePollAsync();
+                if (anket != null) anket = await GetPollWithDetailsAsync(anket.AnketId);
+            }
+            else
+            {
+                anket = await GetPollWithDetailsAsync(id.Value);
             }
 
-            // Oy kontrolü
+            if (anket == null) return RedirectToAction(nameof(Index));
+
             ViewBag.HasVoted = await _context.Oys
                 .AnyAsync(o => o.AnketId == anket.AnketId && o.KullaniciId == currentUserID);
 
             return View(anket);
         }
 
-        // === 5. OY VERME İŞLEMİ (Vote) ===
+        // === 5. VOTE (OY VERME) ===
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Vote(int anketId, int secenekId)
         {
-            // Güvenlik Kontrolü
             var userIdFromSession = HttpContext.Session.GetInt32("UserId");
             if (userIdFromSession == null) return RedirectToAction("Login", "Account");
-
             string currentUserID = userIdFromSession.Value.ToString();
 
             var anket = await _context.Ankets.FindAsync(anketId);
@@ -193,8 +221,7 @@ namespace hey.dou.Controllers
                 return RedirectToAction(nameof(Details), new { id = anketId });
             }
 
-            bool hasVoted = await _context.Oys
-                .AnyAsync(o => o.AnketId == anketId && o.KullaniciId == currentUserID);
+            bool hasVoted = await _context.Oys.AnyAsync(o => o.AnketId == anketId && o.KullaniciId == currentUserID);
 
             if (hasVoted)
             {
@@ -202,21 +229,12 @@ namespace hey.dou.Controllers
                 return RedirectToAction(nameof(Details), new { id = anketId });
             }
 
-            var oy = new Oy
-            {
-                AnketId = anketId,
-                SecenekId = secenekId,
-                KullaniciId = currentUserID
-            };
-
+            var oy = new Oy { AnketId = anketId, SecenekId = secenekId, KullaniciId = currentUserID };
             _context.Oys.Add(oy);
             await _context.SaveChangesAsync();
 
             TempData["Success"] = "Oyunuz kaydedildi!";
             return RedirectToAction(nameof(Details), new { id = anketId });
         }
-
-        // === 6. LİSTELEME (Index) - Artık ana giriş kapısı değil ===
-        
     }
 }
