@@ -33,7 +33,7 @@ namespace hey.dou.Controllers
             }
 
             // DÜZELTME: Rolü 'Ogrenci' OLANLAR VEYA 'KulupBaskani' OLANLAR giriş yapabilir
-            var kullanici = await _context.Kullanicilar.FirstOrDefaultAsync(k =>
+            var kullanici = await _context.Kullanicilars.FirstOrDefaultAsync(k =>
                 k.Email == email &&
                 k.Sifre == password &&
                 (k.Rol == "Ogrenci" || k.Rol == "KulupBaskani"));
@@ -68,7 +68,7 @@ namespace hey.dou.Controllers
             }
 
             // Personel girişi (Öğrenci ve Başkan olmayanlar)
-            var kullanici = await _context.Kullanicilar.FirstOrDefaultAsync(k =>
+            var kullanici = await _context.Kullanicilars.FirstOrDefaultAsync(k =>
                 k.Email == email &&
                 k.Sifre == password &&
                 (k.Rol != "Ogrenci" && k.Rol != "KulupBaskani"));

@@ -1,16 +1,17 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.Collections.Generic;
 
-namespace hey.dou.Models
+namespace hey.dou.Models;
+
+public partial class Kullanicilar
 {
-    public class Kullanici
-    {
-        [Key]
-        public int KullaniciId { get; set; }
+    public int KullaniciId { get; set; }
 
-        // Soru işaretleri (?) ekleyerek uyarıları susturuyoruz
-        public string? AdSoyad { get; set; }
-        public string? Email { get; set; }
-        public string? Sifre { get; set; }
-        public string? Rol { get; set; }
-    }
+    public string AdSoyad { get; set; } = null!;
+
+    public string Email { get; set; } = null!;
+
+    public string Sifre { get; set; } = null!;
+
+    public string Rol { get; set; } = null!;
 }

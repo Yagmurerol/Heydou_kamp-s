@@ -1,25 +1,23 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 
-namespace hey.dou.Models
+namespace hey.dou.Models;
+
+public partial class Anket
 {
-    public partial class Anket
-    {
-        [Key]
-        public int AnketId { get; set; } // DÜZELTME: AnketID -> AnketId (Küçük d)
+    public int AnketId { get; set; }
 
-        [Required]
-        public string Title { get; set; } = null!;
+    public string Title { get; set; } = null!;
 
-        public string? Description { get; set; }
+    public string? Description { get; set; }
 
-        public DateTime EndDate { get; set; }
+    public DateTime EndDate { get; set; }
 
-        public bool IsActive { get; set; } = true;
+    public bool IsActive { get; set; }
 
-        public virtual ICollection<AnketSecenegi> AnketSecenegis { get; set; } = new HashSet<AnketSecenegi>();
+    public virtual ICollection<AnketSecenegi> AnketSecenegis { get; set; } = new List<AnketSecenegi>();
 
-        public virtual ICollection<Oy> Oys { get; set; } = new HashSet<Oy>();
-    }
+    public virtual ICollection<Event> Events { get; set; } = new List<Event>();
+
+    public virtual ICollection<Oy> Oys { get; set; } = new List<Oy>();
 }

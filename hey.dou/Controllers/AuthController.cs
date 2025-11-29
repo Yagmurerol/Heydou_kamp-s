@@ -21,7 +21,7 @@ namespace hey.dou.Controllers
 		{
 			// 1. Veritabanında bu kriterlere uyan bir kullanıcı var mı?
 			// NOT: '_context.Kullanicilars' hata verirse sonundaki 's' harfini silip '_context.Kullanicilar' yapın.
-			var kullanici =_context.Kullanicilar.FirstOrDefault(x =>
+			var kullanici =_context.Kullanicilars.FirstOrDefault(x =>
 				x.Email == gelenVeri.Email &&
 				x.Sifre == gelenVeri.Sifre &&
 				x.Rol == gelenVeri.Rol);

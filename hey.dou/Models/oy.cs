@@ -1,28 +1,19 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿using System;
+using System.Collections.Generic;
 
-namespace hey.dou.Models
+namespace hey.dou.Models;
+
+public partial class Oy
 {
-    public partial class Oy
-    {
-        [Key]
-        [Column("OyID")] // Veritabanında adı OyID
-        public int OyId { get; set; }
+    public int OyId { get; set; }
 
-        [Required]
-        [Column("UserID")] // KRİTİK DÜZELTME: Veritabanında adı UserID, kodda KullaniciId
-        public string KullaniciId { get; set; } = null!;
+    public int AnketId { get; set; }
 
-        [Column("AnketID")] // Veritabanında adı AnketID
-        public int AnketId { get; set; }
+    public int SecenekId { get; set; }
 
-        [Column("SecenekID")] // Veritabanında adı SecenekID
-        public int SecenekId { get; set; }
+    public string KullaniciId { get; set; } = null!;
 
-        [ForeignKey("AnketId")]
-        public virtual Anket Anket { get; set; } = null!;
+    public virtual Anket Anket { get; set; } = null!;
 
-        [ForeignKey("SecenekId")]
-        public virtual AnketSecenegi AnketSecenegi { get; set; } = null!;
-    }
+    public virtual AnketSecenegi Secenek { get; set; } = null!;
 }
