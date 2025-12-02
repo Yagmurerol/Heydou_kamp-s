@@ -1,55 +1,61 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using hey.dou.Models; // Modellerin olduğu yer
+using hey.dou.Models;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace hey.dou.Controllers
 {
-	[Route("api/[controller]")]
-	[ApiController]
-	public class StajController : ControllerBase
-	{
-		private readonly HeydouContext _context;
+    // Artık normal MVC controller
+    public class StajController : Controller
+    {
+        private readonly HeydouContext _context;
 
-		public StajController(HeydouContext context)
-		{
-			_context = context;
-		}
+        public StajController(HeydouContext context)
+        {
+            _context = context;
+        }
 
-		// GET: /api/Staj/Listele
-		[HttpGet("Listele")]
-		public async Task<IActionResult> GetStajIlanlari()
-		{
-			// NOT: '_context.StajIlanlaris' hata verirse sonundaki 's'yi silip '_context.StajIlanlari' yapın.
-			// Scaffold işlemi genelde 's' takısı ekler.
-			var ilanlar = await _context.StajIlanlaris
-										// --- HATA DÜZELTME ---
-										// Hatalı olan: .Where(i => i.Aktif)
-										// Düzeltilmiş: .Where(i => i.Aktif.GetValueOrDefault() == true)
-										// Açıklama: 'Aktif' alanı null gelirse false kabul et, sadece true olanları getir.
-										.Where(i => i.Aktif.GetValueOrDefault() == true)
-										.OrderByDescending(i => i.YayinlanmaTarihi)
-										.Take(50)
-										.Select(i => new
-										{
-											i.Id,
-											i.Baslik,
-											i.Sirket,
-											i.Lokasyon,
-											i.StajTuru,
-											i.Aciklama,
-											i.SonBasvuru,
-											i.BasvuruLinki
-										})
-										.ToListAsync();
+        // /Staj veya /Staj/Index → View
+        [HttpGet]
+        public IActionResult Index()
+        {
+            return View();
+        }
 
-			return Ok(new
-			{
-				success = true,
-				count = ilanlar.Count,
-				stajlar = ilanlar
-			});
-		}
-	}
+        // /api/Staj/Listele → JSON (frontend buraya istek atıyor)
+        [HttpGet("api/Staj/Listele")]
+        public async Task<IActionResult> Listele()
+        {
+            // Önce tüm kayıtları al (debug için filtreyi hafif tuttum)
+            var sorgu = _context.StajIlanlaris.AsQueryable();
+
+            // Aktif kolonun 1 olduğu (true) ilanlar gelsin,
+            // ama null ise de göster (hocanın eklediği datalar kaçmasın diye)
+            sorgu = sorgu.Where(i => i.Aktif == null || i.Aktif == true);
+
+            var ilanlar = await sorgu
+                .OrderByDescending(i => i.YayinlanmaTarihi)
+                .Select(i => new
+                {
+                    i.Id,
+                    i.Baslik,
+                    i.Sirket,
+                    i.Lokasyon,
+                    i.StajTuru,
+                    i.Aciklama,
+                    i.YayinlanmaTarihi,
+                    i.SonBasvuru,
+                    i.BasvuruLinki
+                })
+                .ToListAsync();
+
+            return Ok(new
+            {
+                success = true,
+                count = ilanlar.Count,
+                stajlar = ilanlar
+            });
+        }
+    }
 }

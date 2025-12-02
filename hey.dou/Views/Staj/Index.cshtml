@@ -1,0 +1,314 @@
+﻿@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="tr" class="">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Staj İlanları Sayfası</title>
+
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@100..900&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#ae0e0e",
+                        "background-light": "#f8f6f6",
+                        "background-dark": "#221010"
+                    },
+                    fontFamily: {
+                        display: "Lexend"
+                    },
+                    borderRadius: {
+                        DEFAULT: "0.25rem",
+                        lg: "0.5rem",
+                        xl: "0.75rem",
+                        full: "9999px"
+                    }
+                }
+            }
+        };
+    </script>
+
+    <style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24
+        }
+    </style>
+</head>
+<body class="font-display bg-background-light dark:bg-background-dark">
+    <div class="relative flex h-auto min-h-screen w-full flex-col group/design-root overflow-x-hidden">
+        <div class="layout-container flex h-full grow flex-col">
+
+            <!-- TEK HEADER: sadece logo + HeyDOU -->
+            <header class="flex items-center justify-start whitespace-nowrap border-b border-solid border-white/10 px-4 sm:px-6 lg:px-10 py-3 bg-background-light dark:bg-background-dark/80 backdrop-blur-sm sticky top-0 z-50">
+                <div class="flex items-center gap-4 text-gray-800 dark:text-white">
+                    <div class="size-6 text-primary">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 48 48">
+                            <g clip-path="url(#clip0_6_330)">
+                                <path fill="currentColor" fill-rule="evenodd"
+                                      d="M24 0.757355L47.2426 24L24 47.2426L0.757355 24L24 0.757355ZM21 35.7574V12.2426L9.24264 24L21 35.7574Z"
+                                      clip-rule="evenodd"></path>
+                            </g>
+                            <defs>
+                                <clipPath id="clip0_6_330"><rect width="48" height="48" fill="white"></rect></clipPath>
+                            </defs>
+                        </svg>
+                    </div>
+                    <h2 class="text-lg font-bold leading-tight tracking-[-0.015em]">HeyDOU</h2>
+                </div>
+            </header>
+
+            <!-- MAIN -->
+            <main class="px-4 sm:px-6 lg:px-10 flex flex-1 justify-center py-5">
+                <div class="layout-content-container flex flex-col w-full max-w-7xl flex-1">
+                    <div class="flex flex-wrap justify-between gap-4 py-8">
+                        <div class="flex min-w-72 flex-col gap-2">
+                            <p class="text-gray-900 dark:text-white text-4xl font-black leading-tight tracking-[-0.033em]">
+                                Staj Fırsatlarını Keşfet
+                            </p>
+                            <p class="text-gray-500 dark:text-gray-400 text-base font-normal leading-normal">
+                                Kariyerine yön verecek staj ilanlarını burada bulabilirsin.
+                            </p>
+                        </div>
+                        <div id="ilanCount"
+                             class="flex items-end text-sm text-gray-500 dark:text-gray-400">
+                            <!-- Toplam X ilan burada doldurulacak -->
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col lg:flex-row gap-8">
+                        <!-- Filters Sidebar -->
+                        <aside class="w-full lg:w-72 lg:shrink-0">
+                            <div class="sticky top-24 flex flex-col gap-6 p-6 bg-white dark:bg-gray-800/50 rounded-xl border border-gray-200 dark:border-gray-700">
+                                <h3 class="text-lg font-bold text-gray-900 dark:text-white">Ara &amp; Filtrele</h3>
+
+                                <!-- Arama -->
+                                <div class="flex flex-col gap-2">
+                                    <label for="search" class="text-sm font-medium text-gray-700 dark:text-gray-300">Anahtar Kelime</label>
+                                    <label class="flex flex-col min-w-40 h-11 w-full">
+                                        <div class="flex w-full flex-1 items-stretch rounded-lg h-full">
+                                            <div class="text-gray-400 dark:text-gray-500 flex border border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-900 items-center justify-center pl-3.5 rounded-l-lg border-r-0">
+                                                <span class="material-symbols-outlined text-xl">search</span>
+                                            </div>
+                                            <input id="search"
+                                                   class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-gray-900 dark:text-white focus:outline-0 focus:ring-2 focus:ring-primary border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-900 h-full placeholder:text-gray-400 dark:placeholder:text-gray-500 px-4 rounded-l-none border-l-0 pl-2 text-sm font-normal leading-normal"
+                                                   placeholder="Pozisyon, şirket..." />
+                                        </div>
+                                    </label>
+                                </div>
+
+                                <!-- Sıralama -->
+                                <div class="flex flex-col gap-3">
+                                    <label for="sort" class="text-sm font-medium text-gray-700 dark:text-gray-300">Sırala</label>
+                                    <select id="sort"
+                                            class="form-select w-full rounded-lg border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-white text-sm focus:ring-primary focus:border-primary">
+                                        <option>Yayınlanma Tarihi (En Yeni)</option>
+                                        <option>Son Başvuru Tarihi Yaklaşanlar</option>
+                                    </select>
+                                </div>
+
+                                <button id="filterButton"
+                                        class="flex w-full items-center justify-center rounded-lg h-11 px-6 bg-primary text-white text-sm font-bold hover:bg-primary/90 transition-colors">
+                                    Filtrele
+                                </button>
+                            </div>
+                        </aside>
+
+                        <!-- Main Content -->
+                        <div class="flex-1">
+                            <!-- Dinamik kartlar -->
+                            <div id="stajGrid" class="grid grid-cols-[repeat(auto-fill,minmax(280px,1fr))] gap-6">
+                                <!-- JS ile doldurulacak -->
+                            </div>
+
+                            <!-- Boş / yükleniyor / hata mesajı -->
+                            <div id="stajMessage" class="mt-8 text-sm text-center text-gray-500 dark:text-gray-400"></div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script>
+                const apiUrl = "/api/Staj/Listele";
+
+                const gridEl = document.getElementById("stajGrid");
+                const messageEl = document.getElementById("stajMessage");
+                const searchInput = document.getElementById("search");
+                const sortSelect = document.getElementById("sort");
+                const filterButton = document.getElementById("filterButton");
+                const ilanCountEl = document.getElementById("ilanCount");
+
+                let allStajlar = [];
+
+                function formatTarih(dateStr) {
+                    if (!dateStr) return "Belirtilmemiş";
+                    const d = new Date(dateStr);
+                    if (isNaN(d)) return dateStr;
+                    return d.toLocaleDateString("tr-TR");
+                }
+
+                function getSirketIlkHarf(sirket) {
+                    if (!sirket) return "?";
+                    return sirket.trim().charAt(0).toUpperCase();
+                }
+
+                function renderStajlar() {
+                    const searchValue = (searchInput.value || "").toLowerCase();
+                    const sortValue = sortSelect.value;
+
+                    let list = [...allStajlar];
+
+                    if (searchValue) {
+                        list = list.filter(i =>
+                            (i.baslik || i.Baslik || "").toLowerCase().includes(searchValue) ||
+                            (i.sirket || i.Sirket || "").toLowerCase().includes(searchValue)
+                        );
+                    }
+
+                    const getDate = (item, fieldCamel, fieldPascal) => {
+                        const val = item[fieldCamel] || item[fieldPascal];
+                        return val ? new Date(val) : null;
+                    };
+
+                    if (sortValue.includes("Son Başvuru")) {
+                        list.sort((a, b) => {
+                            const da = getDate(a, "sonBasvuru", "SonBasvuru");
+                            const db = getDate(b, "sonBasvuru", "SonBasvuru");
+                            if (!da && !db) return 0;
+                            if (!da) return 1;
+                            if (!db) return -1;
+                            return da - db;
+                        });
+                    } else {
+                        list.sort((a, b) => {
+                            const da = getDate(a, "yayinlanmaTarihi", "YayinlanmaTarihi");
+                            const db = getDate(b, "yayinlanmaTarihi", "YayinlanmaTarihi");
+                            if (!da && !db) return 0;
+                            if (!da) return 1;
+                            if (!db) return -1;
+                            return db - da;
+                        });
+                    }
+
+                    if (ilanCountEl) {
+                        ilanCountEl.textContent = list.length
+                            ? `Toplam ${list.length} aktif staj ilanı bulundu.`
+                            : "";
+                    }
+
+                    if (!list.length) {
+                        gridEl.innerHTML = "";
+                        messageEl.textContent = "Filtrelere uyan staj ilanı bulunamadı.";
+                        return;
+                    }
+
+                    messageEl.textContent = "";
+
+                    gridEl.innerHTML = list.map(item => {
+                        const baslik = item.baslik || item.Baslik || "";
+                        const sirket = item.sirket || item.Sirket || "";
+                        const lokasyon = item.lokasyon || item.Lokasyon || "";
+                        const stajTuru = item.stajTuru || item.StajTuru || "";
+                        const aciklama = item.aciklama || item.Aciklama || "";
+                        const yayinlanma = formatTarih(item.yayinlanmaTarihi || item.YayinlanmaTarihi);
+                        const sonBasvuru = formatTarih(item.sonBasvuru || item.SonBasvuru);
+                        const basvuruLinki = item.basvuruLinki || item.BasvuruLinki || "#";
+
+                        const ilkHarf = getSirketIlkHarf(sirket);
+
+                        return `
+        <div class="flex flex-col gap-4 p-5 rounded-xl bg-white dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 hover:shadow-lg hover:border-primary/50 dark:hover:border-primary/50 transition-all">
+            <div class="flex items-center gap-4">
+                <div class="w-14 h-14 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+                    <span class="text-lg font-bold text-primary">${ilkHarf}</span>
+                </div>
+                <div class="flex flex-col">
+                    <p class="text-gray-900 dark:text-white text-lg font-bold leading-tight">${baslik}</p>
+                    <p class="text-gray-500 dark:text-gray-400 text-sm font-normal">${sirket}</p>
+                </div>
+            </div>
+            <div class="flex flex-wrap gap-2">
+                <span class="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-2 py-1 text-xs font-medium text-primary">
+                    <span class="material-symbols-outlined !text-sm">location_on</span>${lokasyon}
+                </span>
+                <span class="inline-flex items-center gap-1.5 rounded-full bg-green-500/10 px-2 py-1 text-xs font-medium text-green-600 dark:text-green-400">
+                    <span class="material-symbols-outlined !text-sm">schedule</span>${stajTuru}
+                </span>
+            </div>
+            <div class="border-t border-gray-200 dark:border-gray-700 pt-4 flex justify-between items-center text-xs text-gray-500 dark:text-gray-400">
+                <span>Yayınlanma: ${yayinlanma}</span>
+                <span class="font-medium text-gray-700 dark:text-gray-300">Son Başvuru: ${sonBasvuru}</span>
+            </div>
+            ${aciklama ? `<p class="text-sm text-gray-600 dark:text-gray-300 pt-2">${aciklama}</p>` : ""}
+            <div class="flex justify-end pt-2">
+                <a href="${basvuruLinki}" target="_blank" rel="noopener noreferrer"
+                   class="inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold bg-primary text-white hover:bg-primary/90 transition-colors">
+                    Başvur
+                    <span class="material-symbols-outlined !text-sm">open_in_new</span>
+                </a>
+            </div>
+        </div>`;
+                    }).join("");
+                }
+
+                async function loadStajlar() {
+                    messageEl.textContent = "İlanlar yükleniyor...";
+                    gridEl.innerHTML = "";
+
+                    try {
+                        const res = await fetch(apiUrl);
+                        if (!res.ok) throw new Error("İlanlar yüklenemedi");
+
+                        const data = await res.json();
+
+                        if (!data.success) {
+                            messageEl.textContent = "İlanlar yüklenirken bir hata oluştu.";
+                            return;
+                        }
+
+                        allStajlar = data.stajlar || data.Stajlar || [];
+                        if (!allStajlar.length) {
+                            messageEl.textContent = "Şu anda aktif staj ilanı bulunmamaktadır.";
+                            return;
+                        }
+
+                        messageEl.textContent = "";
+                        renderStajlar();
+                    } catch (err) {
+                        console.error(err);
+                        messageEl.textContent = "Sunucudan veri alınırken bir hata oluştu.";
+                    }
+                }
+
+                document.addEventListener("DOMContentLoaded", () => {
+                    loadStajlar();
+
+                    filterButton.addEventListener("click", () => {
+                        renderStajlar();
+                    });
+
+                    searchInput.addEventListener("keyup", (e) => {
+                        if (e.key === "Enter") {
+                            renderStajlar();
+                        }
+                    });
+
+                    sortSelect.addEventListener("change", () => {
+                        renderStajlar();
+                    });
+                });
+    </script>
+</body>
+</html>

@@ -42,6 +42,20 @@
             </p>
         </a>
 
+        <!-- STAJ İLANLARI (YENİ KART) -->
+        <a asp-controller="Staj" asp-action="Index"
+           class="block p-6 bg-card-light dark:bg-card-dark rounded-xl shadow-lg hover:shadow-2xl transition-shadow duration-300">
+            <div class="flex items-center justify-center bg-primary/10 dark:bg-primary/20 rounded-full h-16 w-16 mb-4">
+                <span class="material-symbols-outlined text-4xl text-primary">
+                    work
+                </span>
+            </div>
+            <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">Staj İlanları</h3>
+            <p class="text-gray-500 dark:text-gray-400">
+                Güncel staj fırsatlarını görüntüleyin ve başvuru linklerine ulaşın.
+            </p>
+        </a>
+
         <!-- ANKETLER -->
         <a asp-controller="Anket" asp-action="Create"
            class="block p-6 bg-card-light dark:bg-card-dark rounded-xl shadow-lg hover:shadow-2xl transition-shadow duration-300">
@@ -56,7 +70,7 @@
             </p>
         </a>
 
-        <!-- 🧠 AI DANIŞMAN (YENİ KART) -->
+        <!-- 🧠 AI DANIŞMAN (İstersen bunu bırak, istersen sonra kaldırırsın) -->
         <a asp-controller="AiDanisman" asp-action="Index"
            class="block p-6 bg-card-light dark:bg-card-dark rounded-xl shadow-lg hover:shadow-2xl transition-shadow duration-300">
             <div class="flex items-center justify-center bg-primary/10 dark:bg-primary/20 rounded-full h-16 w-16 mb-4">
@@ -66,7 +80,7 @@
             </div>
             <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">AI Danışman</h3>
             <p class="text-gray-500 dark:text-gray-400">
-                Öğrenci danışmanına soru sor, AI destekli cevap ve yönlendirme al.
+                Öğrenci asistanına soru sor, AI destekli cevap ve yönlendirme al.
             </p>
         </a>
 
