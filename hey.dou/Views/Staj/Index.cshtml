@@ -12,8 +12,8 @@
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@100..900&display=swap" rel="stylesheet" />
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet" />
 
     <script id="tailwind-config">
         tailwind.config = {
@@ -21,17 +21,25 @@
             theme: {
                 extend: {
                     colors: {
-                        primary: "#ae0e0e",
-                        "background-light": "#f8f6f6",
-                        "background-dark": "#221010"
+                        // ANA TEMA RENKLERİ (TURUNCU)
+                        primary: "#F97316", // Orange-500
+                        "primary-light": "#FFEDD5", // Orange-100
+                        "primary-dark": "#C2410C", // Orange-700
+
+                        // ARKA PLAN RENKLERİ (SLATE)
+                        "background-light": "#F8FAFC", // Slate-50
+                        "background-dark": "#0F172A", // Slate-900
+                        "card-light": "#FFFFFF",
+                        "card-dark": "#1E293B", // Slate-800
                     },
                     fontFamily: {
-                        display: "Lexend"
+                        display: ["'Plus Jakarta Sans'", "sans-serif"],
+                        sans: ["'Plus Jakarta Sans'", "sans-serif"],
                     },
                     borderRadius: {
-                        DEFAULT: "0.25rem",
-                        lg: "0.5rem",
-                        xl: "0.75rem",
+                        DEFAULT: "1rem",
+                        lg: "1rem",
+                        xl: "1.5rem",
                         full: "9999px"
                     }
                 }
@@ -40,99 +48,102 @@
     </script>
 
     <style>
-        .material-symbols-outlined {
-            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background-color: #cbd5e1;
+            border-radius: 20px;
+        }
+
+        .dark ::-webkit-scrollbar-thumb {
+            background-color: #334155;
+        }
+
+        .material-symbols-rounded {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
         }
     </style>
 </head>
-<body class="font-display bg-background-light dark:bg-background-dark">
+<body class="font-sans bg-background-light dark:bg-background-dark text-slate-800 dark:text-slate-200 antialiased transition-colors duration-300">
     <div class="relative flex h-auto min-h-screen w-full flex-col group/design-root overflow-x-hidden">
         <div class="layout-container flex h-full grow flex-col">
 
-            <!-- TEK HEADER: sadece logo + HeyDOU -->
-            <header class="flex items-center justify-start whitespace-nowrap border-b border-solid border-white/10 px-4 sm:px-6 lg:px-10 py-3 bg-background-light dark:bg-background-dark/80 backdrop-blur-sm sticky top-0 z-50">
-                <div class="flex items-center gap-4 text-gray-800 dark:text-white">
-                    <div class="size-6 text-primary">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 48 48">
-                            <g clip-path="url(#clip0_6_330)">
-                                <path fill="currentColor" fill-rule="evenodd"
-                                      d="M24 0.757355L47.2426 24L24 47.2426L0.757355 24L24 0.757355ZM21 35.7574V12.2426L9.24264 24L21 35.7574Z"
-                                      clip-rule="evenodd"></path>
-                            </g>
-                            <defs>
-                                <clipPath id="clip0_6_330"><rect width="48" height="48" fill="white"></rect></clipPath>
-                            </defs>
-                        </svg>
-                    </div>
-                    <h2 class="text-lg font-bold leading-tight tracking-[-0.015em]">HeyDOU</h2>
+            <header class="flex items-center justify-between whitespace-nowrap border-b border-slate-200 dark:border-slate-800 px-4 sm:px-6 lg:px-10 py-3 bg-white/80 dark:bg-background-dark/80 backdrop-blur-md sticky top-0 z-50">
+                <div class="flex items-center gap-2 text-primary font-bold text-2xl tracking-tight">
+                    <span class="material-symbols-rounded filled text-3xl">school</span>
+                    <a href="/Home/Index" class="hover:text-primary-dark transition-colors">HeyDOU</a>
                 </div>
+
+                <a href="/Home/Index" class="text-sm font-medium text-slate-500 hover:text-primary transition-colors flex items-center gap-1">
+                    <span class="material-symbols-rounded">arrow_back</span>
+                    Ana Sayfaya Dön
+                </a>
             </header>
 
-            <!-- MAIN -->
-            <main class="px-4 sm:px-6 lg:px-10 flex flex-1 justify-center py-5">
+            <main class="px-4 sm:px-6 lg:px-10 flex flex-1 justify-center py-8">
                 <div class="layout-content-container flex flex-col w-full max-w-7xl flex-1">
-                    <div class="flex flex-wrap justify-between gap-4 py-8">
+                    <div class="flex flex-wrap justify-between gap-4 py-8 items-end">
                         <div class="flex min-w-72 flex-col gap-2">
-                            <p class="text-gray-900 dark:text-white text-4xl font-black leading-tight tracking-[-0.033em]">
+                            <h1 class="text-slate-900 dark:text-white text-4xl font-black leading-tight tracking-[-0.033em]">
                                 Staj Fırsatlarını Keşfet
-                            </p>
-                            <p class="text-gray-500 dark:text-gray-400 text-base font-normal leading-normal">
+                            </h1>
+                            <p class="text-slate-500 dark:text-slate-400 text-lg font-normal leading-normal">
                                 Kariyerine yön verecek staj ilanlarını burada bulabilirsin.
                             </p>
                         </div>
-                        <div id="ilanCount"
-                             class="flex items-end text-sm text-gray-500 dark:text-gray-400">
-                            <!-- Toplam X ilan burada doldurulacak -->
+                        <div id="ilanCount" class="flex items-end text-sm font-medium text-primary bg-primary/10 px-3 py-1 rounded-lg">
                         </div>
                     </div>
 
                     <div class="flex flex-col lg:flex-row gap-8">
-                        <!-- Filters Sidebar -->
                         <aside class="w-full lg:w-72 lg:shrink-0">
-                            <div class="sticky top-24 flex flex-col gap-6 p-6 bg-white dark:bg-gray-800/50 rounded-xl border border-gray-200 dark:border-gray-700">
-                                <h3 class="text-lg font-bold text-gray-900 dark:text-white">Ara &amp; Filtrele</h3>
+                            <div class="sticky top-24 flex flex-col gap-6 p-6 bg-white dark:bg-card-dark rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm">
+                                <h3 class="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                                    <span class="material-symbols-rounded text-primary">filter_list</span>
+                                    Ara &amp; Filtrele
+                                </h3>
 
-                                <!-- Arama -->
                                 <div class="flex flex-col gap-2">
-                                    <label for="search" class="text-sm font-medium text-gray-700 dark:text-gray-300">Anahtar Kelime</label>
-                                    <label class="flex flex-col min-w-40 h-11 w-full">
-                                        <div class="flex w-full flex-1 items-stretch rounded-lg h-full">
-                                            <div class="text-gray-400 dark:text-gray-500 flex border border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-900 items-center justify-center pl-3.5 rounded-l-lg border-r-0">
-                                                <span class="material-symbols-outlined text-xl">search</span>
-                                            </div>
-                                            <input id="search"
-                                                   class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-gray-900 dark:text-white focus:outline-0 focus:ring-2 focus:ring-primary border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-900 h-full placeholder:text-gray-400 dark:placeholder:text-gray-500 px-4 rounded-l-none border-l-0 pl-2 text-sm font-normal leading-normal"
-                                                   placeholder="Pozisyon, şirket..." />
-                                        </div>
-                                    </label>
+                                    <label for="search" class="text-sm font-medium text-slate-700 dark:text-slate-300">Anahtar Kelime</label>
+                                    <div class="relative">
+                                        <span class="material-symbols-rounded absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">search</span>
+                                        <input id="search"
+                                               class="w-full pl-10 pr-4 py-2.5 rounded-xl border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-900/50 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all text-sm"
+                                               placeholder="Pozisyon, şirket..." />
+                                    </div>
                                 </div>
 
-                                <!-- Sıralama -->
-                                <div class="flex flex-col gap-3">
-                                    <label for="sort" class="text-sm font-medium text-gray-700 dark:text-gray-300">Sırala</label>
-                                    <select id="sort"
-                                            class="form-select w-full rounded-lg border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-white text-sm focus:ring-primary focus:border-primary">
-                                        <option>Yayınlanma Tarihi (En Yeni)</option>
-                                        <option>Son Başvuru Tarihi Yaklaşanlar</option>
-                                    </select>
+                                <div class="flex flex-col gap-2">
+                                    <label for="sort" class="text-sm font-medium text-slate-700 dark:text-slate-300">Sırala</label>
+                                    <div class="relative">
+                                        <span class="material-symbols-rounded absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">sort</span>
+                                        <select id="sort" class="w-full pl-10 pr-8 py-2.5 rounded-xl border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-900/50 text-slate-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent appearance-none cursor-pointer">
+                                            <option>Yayınlanma Tarihi (En Yeni)</option>
+                                            <option>Son Başvuru Tarihi Yaklaşanlar</option>
+                                        </select>
+                                        <span class="material-symbols-rounded absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none">expand_more</span>
+                                    </div>
                                 </div>
 
                                 <button id="filterButton"
-                                        class="flex w-full items-center justify-center rounded-lg h-11 px-6 bg-primary text-white text-sm font-bold hover:bg-primary/90 transition-colors">
+                                        class="w-full flex items-center justify-center gap-2 rounded-xl h-11 bg-primary hover:bg-primary-dark text-white text-sm font-bold transition-all transform active:scale-95 shadow-lg shadow-primary/30">
                                     Filtrele
                                 </button>
                             </div>
                         </aside>
 
-                        <!-- Main Content -->
                         <div class="flex-1">
-                            <!-- Dinamik kartlar -->
-                            <div id="stajGrid" class="grid grid-cols-[repeat(auto-fill,minmax(280px,1fr))] gap-6">
-                                <!-- JS ile doldurulacak -->
+                            <div id="stajGrid" class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             </div>
 
-                            <!-- Boş / yükleniyor / hata mesajı -->
-                            <div id="stajMessage" class="mt-8 text-sm text-center text-gray-500 dark:text-gray-400"></div>
+                            <div id="stajMessage" class="mt-12 flex flex-col items-center justify-center text-center text-slate-400">
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -156,7 +167,7 @@
                     if (!dateStr) return "Belirtilmemiş";
                     const d = new Date(dateStr);
                     if (isNaN(d)) return dateStr;
-                    return d.toLocaleDateString("tr-TR");
+                    return d.toLocaleDateString("tr-TR", { day: 'numeric', month: 'long', year: 'numeric' });
                 }
 
                 function getSirketIlkHarf(sirket) {
@@ -203,18 +214,21 @@
                     }
 
                     if (ilanCountEl) {
-                        ilanCountEl.textContent = list.length
-                            ? `Toplam ${list.length} aktif staj ilanı bulundu.`
+                        ilanCountEl.innerHTML = list.length
+                            ? `<span class="font-bold mr-1">${list.length}</span> ilan listeleniyor`
                             : "";
                     }
 
                     if (!list.length) {
                         gridEl.innerHTML = "";
-                        messageEl.textContent = "Filtrelere uyan staj ilanı bulunamadı.";
+                        messageEl.innerHTML = `
+                            <span class="material-symbols-rounded text-6xl mb-4 opacity-20">search_off</span>
+                            <p class="text-lg">Aradığınız kriterlere uygun ilan bulunamadı.</p>
+                        `;
                         return;
                     }
 
-                    messageEl.textContent = "";
+                    messageEl.innerHTML = "";
 
                     gridEl.innerHTML = list.map(item => {
                         const baslik = item.baslik || item.Baslik || "";
@@ -228,43 +242,57 @@
 
                         const ilkHarf = getSirketIlkHarf(sirket);
 
+                        // Rastgele arka plan rengi seçimi (görsel zenginlik için)
+                        const bgColors = ["bg-orange-100 text-orange-600", "bg-blue-100 text-blue-600", "bg-purple-100 text-purple-600", "bg-green-100 text-green-600"];
+                        const randomBg = bgColors[Math.floor(Math.random() * bgColors.length)];
+
                         return `
-        <div class="flex flex-col gap-4 p-5 rounded-xl bg-white dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 hover:shadow-lg hover:border-primary/50 dark:hover:border-primary/50 transition-all">
-            <div class="flex items-center gap-4">
-                <div class="w-14 h-14 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
-                    <span class="text-lg font-bold text-primary">${ilkHarf}</span>
+        <div class="group flex flex-col justify-between p-6 rounded-2xl bg-white dark:bg-card-dark border border-slate-100 dark:border-slate-700/50 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+            <div>
+                <div class="flex items-start justify-between mb-4">
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-xl ${randomBg} flex items-center justify-center shrink-0 shadow-inner">
+                            <span class="text-xl font-black">${ilkHarf}</span>
+                        </div>
+                        <div>
+                            <h4 class="text-lg font-bold text-slate-900 dark:text-white leading-tight group-hover:text-primary transition-colors line-clamp-1">${baslik}</h4>
+                            <p class="text-slate-500 dark:text-slate-400 text-sm font-medium">${sirket}</p>
+                        </div>
+                    </div>
+
                 </div>
-                <div class="flex flex-col">
-                    <p class="text-gray-900 dark:text-white text-lg font-bold leading-tight">${baslik}</p>
-                    <p class="text-gray-500 dark:text-gray-400 text-sm font-normal">${sirket}</p>
+
+                <div class="flex flex-wrap gap-2 mb-4">
+                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-slate-50 dark:bg-slate-700/50 text-slate-600 dark:text-slate-300 text-xs font-semibold border border-slate-100 dark:border-slate-600">
+                        <span class="material-symbols-rounded !text-sm">location_on</span> ${lokasyon}
+                    </span>
+                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400 text-xs font-semibold border border-green-100 dark:border-green-800/30">
+                        <span class="material-symbols-rounded !text-sm">work</span> ${stajTuru}
+                    </span>
+                </div>
+
+                ${aciklama ? `<p class="text-sm text-slate-600 dark:text-slate-300 mb-4 line-clamp-2">${aciklama}</p>` : ""}
+
+                <div class="flex items-center justify-between text-xs text-slate-400 mb-6 pt-4 border-t border-slate-50 dark:border-slate-700/50">
+                    <span class="flex items-center gap-1"><span class="material-symbols-rounded !text-sm">schedule</span> ${yayinlanma}</span>
+                    <span class="flex items-center gap-1 text-primary"><span class="material-symbols-rounded !text-sm">event_busy</span> Son: ${sonBasvuru}</span>
                 </div>
             </div>
-            <div class="flex flex-wrap gap-2">
-                <span class="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-2 py-1 text-xs font-medium text-primary">
-                    <span class="material-symbols-outlined !text-sm">location_on</span>${lokasyon}
-                </span>
-                <span class="inline-flex items-center gap-1.5 rounded-full bg-green-500/10 px-2 py-1 text-xs font-medium text-green-600 dark:text-green-400">
-                    <span class="material-symbols-outlined !text-sm">schedule</span>${stajTuru}
-                </span>
-            </div>
-            <div class="border-t border-gray-200 dark:border-gray-700 pt-4 flex justify-between items-center text-xs text-gray-500 dark:text-gray-400">
-                <span>Yayınlanma: ${yayinlanma}</span>
-                <span class="font-medium text-gray-700 dark:text-gray-300">Son Başvuru: ${sonBasvuru}</span>
-            </div>
-            ${aciklama ? `<p class="text-sm text-gray-600 dark:text-gray-300 pt-2">${aciklama}</p>` : ""}
-            <div class="flex justify-end pt-2">
-                <a href="${basvuruLinki}" target="_blank" rel="noopener noreferrer"
-                   class="inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold bg-primary text-white hover:bg-primary/90 transition-colors">
-                    Başvur
-                    <span class="material-symbols-outlined !text-sm">open_in_new</span>
-                </a>
-            </div>
+
+            <a href="${basvuruLinki}" target="_blank" rel="noopener noreferrer"
+               class="w-full flex items-center justify-center gap-2 rounded-xl py-3 text-sm font-bold bg-slate-900 dark:bg-slate-700 hover:bg-primary text-white transition-all group-hover:shadow-lg group-hover:shadow-primary/20">
+                Başvuru Yap
+                <span class="material-symbols-rounded !text-lg">open_in_new</span>
+            </a>
         </div>`;
                     }).join("");
                 }
 
                 async function loadStajlar() {
-                    messageEl.textContent = "İlanlar yükleniyor...";
+                    messageEl.innerHTML = `
+                        <span class="material-symbols-rounded text-4xl animate-spin text-primary mb-2">progress_activity</span>
+                        <p>İlanlar yükleniyor...</p>
+                    `;
                     gridEl.innerHTML = "";
 
                     try {
@@ -280,15 +308,21 @@
 
                         allStajlar = data.stajlar || data.Stajlar || [];
                         if (!allStajlar.length) {
-                            messageEl.textContent = "Şu anda aktif staj ilanı bulunmamaktadır.";
+                            messageEl.innerHTML = `
+                                <span class="material-symbols-rounded text-6xl mb-4 opacity-20">inbox</span>
+                                <p class="text-lg">Şu anda aktif staj ilanı bulunmamaktadır.</p>
+                            `;
                             return;
                         }
 
-                        messageEl.textContent = "";
+                        messageEl.innerHTML = "";
                         renderStajlar();
                     } catch (err) {
                         console.error(err);
-                        messageEl.textContent = "Sunucudan veri alınırken bir hata oluştu.";
+                        messageEl.innerHTML = `
+                            <span class="material-symbols-rounded text-6xl mb-4 text-red-400 opacity-50">error</span>
+                            <p class="text-lg text-red-500">Sunucuyla bağlantı kurulamadı.</p>
+                        `;
                     }
                 }
 
