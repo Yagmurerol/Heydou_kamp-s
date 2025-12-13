@@ -3,6 +3,17 @@
     ViewData["Title"] = "Yeni Etkinlik Oluştur";
 }
 
+<!-- ✅ HOME'A DÖN (Login hariç) -->
+<div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-10 pt-6">
+    <div class="flex justify-end">
+        <a href="@Url.Action("Index", "Home")"
+           class="inline-flex items-center gap-2 h-10 px-4 rounded-xl bg-gray-900 text-white hover:bg-black transition shadow-sm hover:shadow-md">
+            <span class="material-symbols-outlined text-[20px]">home</span>
+            Ana Sayfaya Dön
+        </a>
+    </div>
+</div>
+
 <div class="max-w-2xl mx-auto px-4 py-8">
     <div class="bg-white dark:bg-[#1a2835] shadow-xl sm:rounded-2xl overflow-hidden border border-gray-100 dark:border-gray-700">
 
@@ -11,29 +22,39 @@
                 <span class="material-symbols-outlined text-primary">add_circle</span>
                 @ViewData["Title"]
             </h3>
-            <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Kulüp başkanı olarak yeni bir etkinlik oylaması başlatın.</p>
+            <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                Kulüp başkanı olarak yeni bir etkinlik oylaması başlatın.
+            </p>
         </div>
 
         <div class="px-6 py-6">
-            <div asp-validation-summary="ModelOnly" class="mb-6 p-4 rounded-lg bg-red-50 border border-red-200 text-red-600 text-sm font-medium"></div>
+            <div asp-validation-summary="ModelOnly"
+                 class="mb-6 p-4 rounded-lg bg-red-50 border border-red-200 text-red-600 text-sm font-medium"></div>
 
             <form asp-action="Create" method="post" class="space-y-6">
+                @Html.AntiForgeryToken()
 
                 <div>
                     <label asp-for="KulupAdi" class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1">Kulüp Adı</label>
-                    <input asp-for="KulupAdi" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary dark:bg-gray-800 dark:text-white transition-colors" placeholder="Örn: Edebiyat Kulübü" />
+                    <input asp-for="KulupAdi"
+                           class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary dark:bg-gray-800 dark:text-white transition-colors"
+                           placeholder="Örn: Edebiyat Kulübü" />
                     <span asp-validation-for="KulupAdi" class="text-red-500 text-xs mt-1 block"></span>
                 </div>
 
                 <div>
                     <label asp-for="KulupBaskaniAdi" class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1">Kulüp Başkanı Adı</label>
-                    <input asp-for="KulupBaskaniAdi" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary dark:bg-gray-800 dark:text-white transition-colors" placeholder="Örn: Ad Soyad" />
+                    <input asp-for="KulupBaskaniAdi"
+                           class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary dark:bg-gray-800 dark:text-white transition-colors"
+                           placeholder="Örn: Ad Soyad" />
                     <span asp-validation-for="KulupBaskaniAdi" class="text-red-500 text-xs mt-1 block"></span>
                 </div>
 
                 <div>
                     <label asp-for="EtkinlikAdi" class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1">Etkinlik Adı (Oylama Başlığı)</label>
-                    <input asp-for="EtkinlikAdi" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary dark:bg-gray-800 dark:text-white transition-colors" placeholder="Örn: Yıllık Kitap Fuarı" />
+                    <input asp-for="EtkinlikAdi"
+                           class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary dark:bg-gray-800 dark:text-white transition-colors"
+                           placeholder="Örn: Yıllık Kitap Fuarı" />
                     <span asp-validation-for="EtkinlikAdi" class="text-red-500 text-xs mt-1 block"></span>
                 </div>
 
@@ -41,28 +62,35 @@
                     <label asp-for="Konum" class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1">Etkinlik Konumu</label>
                     <div class="relative">
                         <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">location_on</span>
-                        <input asp-for="Konum" class="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary dark:bg-gray-800 dark:text-white transition-colors" placeholder="Örn: Konferans Salonu" />
+                        <input asp-for="Konum"
+                               class="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary dark:bg-gray-800 dark:text-white transition-colors"
+                               placeholder="Örn: Konferans Salonu" />
                     </div>
                     <span asp-validation-for="Konum" class="text-red-500 text-xs mt-1 block"></span>
                 </div>
 
                 <div>
                     <label asp-for="TarihSaat" class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1">Tarih ve Saat</label>
-                    <input asp-for="TarihSaat" type="datetime-local" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary dark:bg-gray-800 dark:text-white transition-colors" />
+                    <input asp-for="TarihSaat" type="datetime-local"
+                           class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary dark:bg-gray-800 dark:text-white transition-colors" />
                     <span asp-validation-for="TarihSaat" class="text-red-500 text-xs mt-1 block"></span>
                 </div>
 
                 <div>
                     <label asp-for="KisaAciklama" class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1">Etkinlik Açıklaması</label>
-                    <textarea asp-for="KisaAciklama" rows="4" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary dark:bg-gray-800 dark:text-white transition-colors" placeholder="Etkinlik hakkında kısa bilgi verin..."></textarea>
+                    <textarea asp-for="KisaAciklama" rows="4"
+                              class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary dark:bg-gray-800 dark:text-white transition-colors"
+                              placeholder="Etkinlik hakkında kısa bilgi verin..."></textarea>
                     <span asp-validation-for="KisaAciklama" class="text-red-500 text-xs mt-1 block"></span>
                 </div>
 
                 <div class="flex items-center justify-end gap-3 pt-4 border-t border-gray-100 dark:border-gray-700">
-                    <a asp-action="Index" class="px-5 py-2.5 rounded-xl text-gray-700 dark:text-gray-300 font-medium hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+                    <a asp-action="Index"
+                       class="px-5 py-2.5 rounded-xl text-gray-700 dark:text-gray-300 font-medium hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
                         İptal
                     </a>
-                    <button type="submit" class="px-6 py-2.5 bg-primary hover:bg-red-600 text-white rounded-xl font-bold shadow-lg shadow-primary/30 transition-all transform hover:-translate-y-0.5">
+                    <button type="submit"
+                            class="px-6 py-2.5 bg-primary hover:bg-red-600 text-white rounded-xl font-bold shadow-lg shadow-primary/30 transition-all transform hover:-translate-y-0.5">
                         Etkinliği Oluştur
                     </button>
                 </div>

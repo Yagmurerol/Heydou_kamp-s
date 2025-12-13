@@ -3,34 +3,55 @@
     ViewData["Title"] = "Yeni Menü Ekle";
 }
 
-<h2>@ViewData["Title"]</h2>
-<hr />
+<div class="mx-auto max-w-3xl px-4 sm:px-6 lg:px-10 py-10">
+    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-8">
+        <div class="flex items-center gap-3">
+            <div class="h-11 w-11 rounded-2xl bg-orange-500 text-white flex items-center justify-center">
+                <span class="material-symbols-outlined">edit</span>
+            </div>
+            <div>
+                <h1 class="text-2xl font-black text-gray-900">@ViewData["Title"]</h1>
+                <p class="text-gray-600">Haftalık menü içeriğini buradan ekleyebilirsin.</p>
+            </div>
+        </div>
 
-<form asp-action="MenuEkle" method="post">
+        <form asp-action="MenuEkle" method="post" class="mt-8 space-y-5">
+            <div asp-validation-summary="ModelOnly" class="text-red-600 text-sm"></div>
 
-    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div>
+                <label asp-for="Tarih" class="block text-sm font-semibold text-gray-700 mb-2"></label>
+                <input asp-for="Tarih" type="date"
+                       class="w-full h-11 rounded-xl border border-gray-200 px-4 focus:outline-none focus:ring-2 focus:ring-orange-300" />
+                <span asp-validation-for="Tarih" class="text-red-600 text-sm"></span>
+            </div>
 
-    <div class="form-group mb-3">
-        <label asp-for="Tarih" class="form-label"></label>
-        <input asp-for="Tarih" class="form-control" type="date" />
-        <span asp-validation-for="Tarih" class="text-danger"></span>
+            <div>
+                <label asp-for="MenuIcerigi" class="block text-sm font-semibold text-gray-700 mb-2"></label>
+                <textarea asp-for="MenuIcerigi" rows="6"
+                          class="w-full rounded-xl border border-gray-200 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-orange-300"></textarea>
+                <span asp-validation-for="MenuIcerigi" class="text-red-600 text-sm"></span>
+            </div>
+
+            <div>
+                <label asp-for="Notlar" class="block text-sm font-semibold text-gray-700 mb-2"></label>
+                <input asp-for="Notlar"
+                       class="w-full h-11 rounded-xl border border-gray-200 px-4 focus:outline-none focus:ring-2 focus:ring-orange-300" />
+                <span asp-validation-for="Notlar" class="text-red-600 text-sm"></span>
+            </div>
+
+            <div class="pt-2 flex items-center gap-3">
+                <button type="submit"
+                        class="h-11 px-5 rounded-xl bg-gray-900 text-white hover:bg-black">
+                    Menüyü Kaydet
+                </button>
+                <a asp-action="Index"
+                   class="h-11 px-5 rounded-xl bg-gray-100 hover:bg-gray-200 inline-flex items-center">
+                    Menü Listesine Dön
+                </a>
+            </div>
+        </form>
     </div>
-
-    <div class="form-group mb-3">
-        <label asp-for="MenuIcerigi" class="form-label"></label>
-        <textarea asp-for="MenuIcerigi" class="form-control" rows="5"></textarea>
-        <span asp-validation-for="MenuIcerigi" class="text-danger"></span>
-    </div>
-
-    <div class="form-group mb-3">
-        <label asp-for="Notlar" class="form-label"></label>
-        <input asp-for="Notlar" class="form-control" />
-        <span asp-validation-for="Notlar" class="text-danger"></span>
-    </div>
-
-    <button type="submit" class="btn btn-primary">Menüyü Kaydet</button>
-    <a asp-action="Index" class="btn btn-secondary">Menü Listesine Dön</a>
-</form>
+</div>
 
 @section Scripts {
     @{

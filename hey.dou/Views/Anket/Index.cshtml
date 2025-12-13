@@ -6,96 +6,88 @@
     ViewData["Title"] = "Aktif Etkinlik Oylamaları";
 }
 
-<script>
-    tailwind.config = {
-        darkMode: "class",
-        theme: {
-            extend: {
-                colors: {
-                    primary: "#de7d7d",
-                    "background-light": "#f8f6f6",
-                    "background-dark": "#1f1313",
-                    "card-light": "#FFFFFF",
-                    "card-dark": "#2A2A2A"
-                },
-                fontFamily: {
-                    display: "Plus Jakarta Sans"
-                }
-            }
-        }
-    };
-</script>
+<!-- ✅ HOME'A DÖN (Login hariç) -->
+<div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-10 pt-6">
+    <div class="flex justify-end">
+        <a href="@Url.Action("Index", "Home")"
+           class="inline-flex items-center gap-2 h-10 px-4 rounded-xl bg-gray-900 text-white hover:bg-black transition shadow-sm hover:shadow-md">
+            <span class="material-symbols-outlined text-[20px]">home</span>
+            Ana Sayfaya Dön
+        </a>
+    </div>
+</div>
 
-<div class="min-h-screen bg-background-light dark:bg-background-dark font-display text-gray-800 dark:text-gray-200 py-10">
-    <div class="container mx-auto px-4 lg:px-8">
-
-        <div class="flex flex-col md:flex-row justify-between items-center mb-10 gap-4">
-            <div>
-                <h2 class="text-3xl md:text-4xl font-black text-gray-900 dark:text-white">@ViewData["Title"]</h2>
-                <p class="text-gray-500 dark:text-[#9db4b9] mt-2">Aşağıdaki aktif oylamalara katılabilirsiniz.</p>
-            </div>
-
-            @if (HttpContextAccessor.HttpContext.Session.GetString("Rol") == "KulupBaskani")
-            {
-                <a asp-action="Create" class="flex items-center gap-2 bg-primary hover:bg-red-500 text-white px-6 py-3 rounded-xl font-bold transition-transform transform hover:scale-105 shadow-lg">
-                    <span class="material-symbols-outlined">add_circle</span>
-                    Yeni Etkinlik Oylaması Başlat
-                </a>
-            }
+<div class="px-4 sm:px-10 lg:px-40 py-8">
+    <div class="flex flex-col md:flex-row justify-between items-center mb-10 gap-4">
+        <div>
+            <h2 class="text-3xl md:text-4xl font-black text-gray-900 dark:text-white">@ViewData["Title"]</h2>
+            <p class="text-gray-500 dark:text-gray-300 mt-2">Aşağıdaki aktif oylamalara katılabilirsiniz.</p>
         </div>
 
-        @if (TempData["Info"] != null)
+        @if (HttpContextAccessor.HttpContext.Session.GetString("Rol") == "KulupBaskani")
         {
-            <div class="bg-blue-50 border-l-4 border-blue-400 p-4 mb-6 text-blue-700 rounded-r">
-                @TempData["Info"]
-            </div>
-        }
-
-        @if (!Model.Any())
-        {
-            <div class="bg-white dark:bg-[#1a2835] p-10 rounded-2xl shadow-sm text-center border border-dashed border-gray-300 dark:border-gray-700">
-                <span class="material-symbols-outlined text-gray-300 text-6xl mb-3">event_busy</span>
-                <h3 class="text-xl font-bold text-gray-900 dark:text-white">Aktif Oylama Yok</h3>
-                <p class="text-gray-500 dark:text-gray-400 mt-1">Şu anda katılabileceğiniz bir etkinlik anketi bulunmamaktadır.</p>
-            </div>
-        }
-        else
-        {
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                @foreach (var anket in Model)
-                {
-                    // Kalan süreyi hesapla
-                    var timeLeft = anket.EndDate - DateTime.Now;
-                    string timeText = timeLeft.TotalHours > 1
-                    ? $"{Math.Floor(timeLeft.TotalHours)} saat kaldı"
-                    : $"{timeLeft.Minutes} dakika kaldı";
-
-                    <div class="bg-white dark:bg-[#1a2835] rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100 dark:border-gray-700 flex flex-col h-full">
-
-                        <div class="flex justify-between items-start mb-4">
-                            <span class="bg-green-100 text-green-800 text-xs font-bold px-2.5 py-1 rounded-full dark:bg-green-900 dark:text-green-300 flex items-center gap-1">
-                                <span class="material-symbols-outlined text-[14px]">how_to_vote</span> Aktif
-                            </span>
-                            <span class="text-primary text-xs font-bold flex items-center gap-1 bg-primary/10 px-2 py-1 rounded-lg">
-                                <span class="material-symbols-outlined text-[14px]">timer</span> @timeText
-                            </span>
-                        </div>
-
-                        <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2 line-clamp-2" title="@anket.Title">
-                            @anket.Title
-                        </h3>
-
-                        <p class="text-gray-500 dark:text-gray-400 text-sm mb-6 line-clamp-3 flex-grow">
-                            Oy vermek ve detayları görmek için tıklayınız.
-                        </p>
-
-                        <a asp-action="Details" asp-route-id="@anket.AnketId" class="mt-auto w-full flex items-center justify-center gap-2 bg-gray-900 dark:bg-gray-700 hover:bg-primary hover:text-white text-white py-3 rounded-xl font-semibold transition-colors duration-300 group">
-                            Oylamaya Git
-                            <span class="material-symbols-outlined group-hover:translate-x-1 transition-transform">arrow_forward</span>
-                        </a>
-                    </div>
-                }
-            </div>
+            <a asp-action="Create"
+               class="flex items-center gap-2 bg-primary hover:bg-red-500 text-white px-6 py-3 rounded-xl font-bold transition-transform transform hover:scale-105 shadow-lg">
+                <span class="material-symbols-outlined">add_circle</span>
+                Yeni Etkinlik Oylaması Başlat
+            </a>
         }
     </div>
+
+    @if (TempData["Info"] != null)
+    {
+        <div class="bg-blue-50 border-l-4 border-blue-400 p-4 mb-6 text-blue-700 rounded-r">
+            @TempData["Info"]
+        </div>
+    }
+
+    @if (!Model.Any())
+    {
+        <div class="bg-white dark:bg-[#1a2835] p-10 rounded-2xl shadow-sm text-center border border-dashed border-gray-300 dark:border-gray-700">
+            <span class="material-symbols-outlined text-gray-300 text-6xl mb-3">event_busy</span>
+            <h3 class="text-xl font-bold text-gray-900 dark:text-white">Aktif Oylama Yok</h3>
+            <p class="text-gray-500 dark:text-gray-400 mt-1">Şu anda katılabileceğiniz bir etkinlik anketi bulunmamaktadır.</p>
+        </div>
+    }
+    else
+    {
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            @foreach (var anket in Model)
+            {
+                var timeLeft = anket.EndDate - DateTime.Now;
+
+                string timeText =
+                timeLeft.TotalSeconds <= 0 ? "Süre doldu" :
+                timeLeft.TotalDays >= 1 ? $"{Math.Floor(timeLeft.TotalDays)} gün kaldı" :
+                timeLeft.TotalHours >= 1 ? $"{Math.Floor(timeLeft.TotalHours)} saat kaldı" :
+                $"{Math.Max(0, timeLeft.Minutes)} dakika kaldı";
+
+                <div class="bg-white dark:bg-[#1a2835] rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100 dark:border-gray-700 flex flex-col h-full">
+
+                    <div class="flex justify-between items-start mb-4">
+                        <span class="bg-green-100 text-green-800 text-xs font-bold px-2.5 py-1 rounded-full dark:bg-green-900 dark:text-green-300 flex items-center gap-1">
+                            <span class="material-symbols-outlined text-[14px]">how_to_vote</span> Aktif
+                        </span>
+                        <span class="text-primary text-xs font-bold flex items-center gap-1 bg-primary/10 px-2 py-1 rounded-lg">
+                            <span class="material-symbols-outlined text-[14px]">timer</span> @timeText
+                        </span>
+                    </div>
+
+                    <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2 line-clamp-2" title="@anket.Title">
+                        @anket.Title
+                    </h3>
+
+                    <p class="text-gray-500 dark:text-gray-400 text-sm mb-6 line-clamp-3 flex-grow">
+                        Oy vermek ve detayları görmek için tıklayınız.
+                    </p>
+
+                    <a asp-action="Details" asp-route-id="@anket.AnketId"
+                       class="mt-auto w-full flex items-center justify-center gap-2 bg-gray-900 dark:bg-gray-700 hover:bg-primary hover:text-white text-white py-3 rounded-xl font-semibold transition-colors duration-300 group">
+                        Oylamaya Git
+                        <span class="material-symbols-outlined group-hover:translate-x-1 transition-transform">arrow_forward</span>
+                    </a>
+                </div>
+            }
+        </div>
+    }
 </div>

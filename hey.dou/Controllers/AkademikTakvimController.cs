@@ -32,10 +32,11 @@ namespace hey.dou.Controllers
             ViewBag.NextYear = next.Year;
             ViewBag.NextMonth = next.Month;
 
-            // Bu ayın etkinlikleri
+            // ✅ Bu ayla kesişen tüm etkinlikler (çok günlük dahil)
             var events = await _context.AkademikTakvims
-                .Where(e => e.BaslangicTarihi >= DateOnly.FromDateTime(firstDay)
-                         && e.BaslangicTarihi <= DateOnly.FromDateTime(lastDay))
+                .Where(e =>
+                    e.BaslangicTarihi <= DateOnly.FromDateTime(lastDay) &&
+                    e.BitisTarihi >= DateOnly.FromDateTime(firstDay))
                 .OrderBy(e => e.BaslangicTarihi)
                 .ToListAsync();
 
@@ -50,13 +51,15 @@ namespace hey.dou.Controllers
 
             var today = DateOnly.FromDateTime(DateTime.Today);
 
+            // ✅ Seçilen günü kapsayan etkinlikler (aralık kontrolü)
             var events = await _context.AkademikTakvims
-                .Where(e => e.BaslangicTarihi == selectedDate)
+                .Where(e => e.BaslangicTarihi <= selectedDate && e.BitisTarihi >= selectedDate)
                 .OrderBy(e => e.BaslangicTarihi)
                 .ToListAsync();
 
             if (!events.Any())
             {
+                // Yaklaşan 5 etkinlik (fallback)
                 events = await _context.AkademikTakvims
                     .Where(e => e.BaslangicTarihi >= today)
                     .OrderBy(e => e.BaslangicTarihi)
@@ -77,12 +80,14 @@ namespace hey.dou.Controllers
                     : ev.RenkKodu;
 
                 return $@"
-                    <div class='flex items-start gap-3 p-3 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800/40'>
+                    <div class='flex items-start gap-3 p-3 rounded-xl hover:bg-slate-50'>
                         <div class='h-3 w-3 rounded-full mt-1.5' style='background-color:{renk}'></div>
                         <div>
                             <p class='font-semibold text-sm'>{ev.Kategori}</p>
                             <p class='text-xs text-gray-500'>{ev.Aciklama}</p>
-                            <p class='text-[11px] text-gray-400'>{ev.BaslangicTarihi:dd.MM.yyyy} - {ev.BitisTarihi:dd.MM.yyyy}</p>
+                            <p class='text-[11px] text-gray-400'>
+                                {ev.BaslangicTarihi:dd.MM.yyyy} - {ev.BitisTarihi:dd.MM.yyyy}
+                            </p>
                         </div>
                     </div>";
             }));
