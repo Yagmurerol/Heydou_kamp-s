@@ -11,10 +11,6 @@ public partial class Mekanlar
 
     public string? Aciklama { get; set; }
 
-    public int KoordinatX { get; set; }
-
-    public int KoordinatY { get; set; }
-
     public int KatId { get; set; }
 
     public virtual Katlar Kat { get; set; } = null!;

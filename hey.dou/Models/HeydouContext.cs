@@ -133,7 +133,7 @@ public partial class HeydouContext : DbContext
 
         modelBuilder.Entity<Katlar>(entity =>
         {
-            entity.HasKey(e => e.KatId).HasName("PK__Katlar__04016A0A12D16205");
+            entity.HasKey(e => e.KatId).HasName("PK__Katlar__04016A0A79006243");
 
             entity.ToTable("Katlar");
 
@@ -157,7 +157,7 @@ public partial class HeydouContext : DbContext
 
         modelBuilder.Entity<Mekanlar>(entity =>
         {
-            entity.HasKey(e => e.MekanId).HasName("PK__Mekanlar__7312BA59CB070897");
+            entity.HasKey(e => e.MekanId).HasName("PK__Mekanlar__7312BA59B4AE78EB");
 
             entity.ToTable("Mekanlar");
 
@@ -167,7 +167,7 @@ public partial class HeydouContext : DbContext
             entity.HasOne(d => d.Kat).WithMany(p => p.Mekanlars)
                 .HasForeignKey(d => d.KatId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__Mekanlar__KatId__0A688BB1");
+                .HasConstraintName("FK__Mekanlar__KatId__2334397B");
         });
 
         modelBuilder.Entity<Oy>(entity =>
