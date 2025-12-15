@@ -8,7 +8,6 @@
     var oncekiHaftaUrl = Url.Action("Index", "Yemekhane", new { startOfWeek = ((DateOnly)ViewBag.OncekiHafta).ToString("yyyy-MM-dd") });
     var sonrakiHaftaUrl = Url.Action("Index", "Yemekhane", new { startOfWeek = ((DateOnly)ViewBag.SonrakiHafta).ToString("yyyy-MM-dd") });
 
-    // Bugün etiketi için (gün ismi eşleştirmesi basit tutuldu)
     var today = DateTime.Now;
     var todayTr = today.DayOfWeek switch
     {
@@ -22,184 +21,149 @@
     };
 }
 
-<!-- ÜST HERO (arka plan tıklamayı engellemesin diye pointer-events-none) -->
-<section class="relative overflow-hidden">
+<section class="relative overflow-hidden mb-8">
     <div class="pointer-events-none absolute inset-0">
-        <div class="absolute -top-24 -right-24 h-72 w-72 rounded-full bg-orange-200/50 blur-3xl"></div>
-        <div class="absolute -bottom-24 -left-24 h-72 w-72 rounded-full bg-purple-200/50 blur-3xl"></div>
+        <div class="absolute -top-24 -right-24 h-72 w-72 rounded-full bg-orange-200/40 blur-3xl"></div>
+        <div class="absolute -bottom-24 -left-24 h-72 w-72 rounded-full bg-purple-200/40 blur-3xl"></div>
     </div>
 
-    <!-- Sticky Header (sağ üst tıklama sorunlarını çözer) -->
-    <header class="sticky top-0 z-50 backdrop-blur bg-white/75 border-b border-gray-100">
-        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-10 py-4 flex items-center justify-between">
-            <div class="flex items-center gap-3">
-                <div class="h-11 w-11 rounded-2xl bg-orange-500 text-white flex items-center justify-center shadow-sm">
-                    <span class="material-symbols-outlined text-[28px]">restaurant</span>
-                </div>
-                <div class="leading-tight">
-                    <p class="text-sm text-gray-500">HeyDOU • Yemekhane</p>
-                    <h1 class="text-lg font-extrabold text-gray-900">Haftalık Menü</h1>
-                </div>
-            </div>
-
-            <!-- Sağ üst butonlar (çalışmıyorsa artık çalışır: z-50 + sticky) -->
-            <div class="flex items-center gap-2">
-                <a href="@Url.Action("Index", "Home")"
-                   class="hidden sm:inline-flex items-center gap-2 h-10 px-4 rounded-xl bg-gray-900 text-white hover:bg-black">
-                    <span class="material-symbols-outlined text-[20px]">home</span>
-                    Ana Sayfa
-                </a>
-            </div>
-        </div>
-    </header>
-
-    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-10 pt-10 pb-6">
+    <div class="pt-6 pb-2">
         <div class="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6">
             <div>
-                <h2 class="text-4xl md:text-5xl font-black text-gray-900">
+                <h2 class="text-4xl md:text-5xl font-black text-slate-900 dark:text-white">
                     Haftanın Lezzetleri 🍽️
                 </h2>
-                <p class="mt-3 text-gray-600 max-w-2xl">
+                <p class="mt-3 text-slate-600 dark:text-slate-300 max-w-2xl">
                     Gün gün menüyü hızlıca gör, bugünü öne çıkar, haftalar arasında rahatça gez.
-                    Okul portalı hissine uygun sade ama modern bir tasarım.
                 </p>
             </div>
 
-            <!-- Hafta Seçici Bar -->
             <div class="w-full lg:w-auto">
-                <div class="flex items-center justify-between gap-3 bg-white rounded-2xl border border-gray-100 shadow-sm px-4 py-3">
+                <div class="flex items-center justify-between gap-3 bg-white dark:bg-card-dark rounded-2xl border border-slate-100 dark:border-slate-700 shadow-sm px-4 py-3">
                     <a href="@oncekiHaftaUrl"
-                       class="h-10 w-10 rounded-xl bg-gray-100 hover:bg-gray-200 flex items-center justify-center"
+                       class="h-10 w-10 rounded-xl bg-slate-100 dark:bg-slate-700/50 hover:bg-slate-200 dark:hover:bg-slate-700 flex items-center justify-center"
                        title="Önceki hafta">
-                        <span class="material-symbols-outlined">chevron_left</span>
+                        <span class="material-symbols-rounded">chevron_left</span>
                     </a>
 
                     <div class="text-center">
-                        <p class="text-xs text-gray-500">Seçili Hafta</p>
-                        <p class="font-extrabold text-gray-900">
+                        <p class="text-xs text-slate-500">Seçili Hafta</p>
+                        <p class="font-extrabold text-slate-900 dark:text-white">
                             @baslangic.ToString("dd MMMM") – @bitis.ToString("dd MMMM")
                         </p>
                     </div>
 
                     <a href="@sonrakiHaftaUrl"
-                       class="h-10 w-10 rounded-xl bg-gray-100 hover:bg-gray-200 flex items-center justify-center"
+                       class="h-10 w-10 rounded-xl bg-slate-100 dark:bg-slate-700/50 hover:bg-slate-200 dark:hover:bg-slate-700 flex items-center justify-center"
                        title="Sonraki hafta">
-                        <span class="material-symbols-outlined">chevron_right</span>
+                        <span class="material-symbols-rounded">chevron_right</span>
                     </a>
                 </div>
             </div>
         </div>
 
-        <!-- Mini İstatistik / Bilgilendirme Kartları -->
         <div class="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div class="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm">
-                <p class="text-sm text-gray-500">Bugün</p>
-                <p class="mt-1 text-xl font-extrabold text-gray-900">@todayTr</p>
-                <p class="mt-1 text-sm text-gray-600">Bugünün menüsü aşağıda “Bugün” etiketiyle işaretli.</p>
+            <div class="bg-white dark:bg-card-dark rounded-2xl border border-slate-100 dark:border-slate-700 p-5 shadow-sm">
+                <p class="text-sm text-slate-500">Bugün</p>
+                <p class="mt-1 text-xl font-extrabold text-slate-900 dark:text-white">@todayTr</p>
+                <p class="mt-1 text-sm text-slate-600 dark:text-slate-300">Bugünün menüsü “Bugün” etiketiyle işaretli.</p>
             </div>
 
-            <div class="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm">
-                <p class="text-sm text-gray-500">İpucu</p>
-                <p class="mt-1 text-xl font-extrabold text-gray-900">Kart görünümü</p>
-                <p class="mt-1 text-sm text-gray-600">Günleri kolay taraman için ikonlu ve bölümlü.</p>
+            <div class="bg-white dark:bg-card-dark rounded-2xl border border-slate-100 dark:border-slate-700 p-5 shadow-sm">
+                <p class="text-sm text-slate-500">İpucu</p>
+                <p class="mt-1 text-xl font-extrabold text-slate-900 dark:text-white">Kart görünümü</p>
+                <p class="mt-1 text-sm text-slate-600 dark:text-slate-300">Günleri kolay taraman için ikonlu ve bölümlü.</p>
             </div>
 
-            <div class="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm">
-                <p class="text-sm text-gray-500">Hızlı Gezinme</p>
-                <p class="mt-1 text-xl font-extrabold text-gray-900">Hafta değiştir</p>
-                <p class="mt-1 text-sm text-gray-600">Sağ/sol oklarla haftalar arasında geç.</p>
+            <div class="bg-white dark:bg-card-dark rounded-2xl border border-slate-100 dark:border-slate-700 p-5 shadow-sm">
+                <p class="text-sm text-slate-500">Hızlı Gezinme</p>
+                <p class="mt-1 text-xl font-extrabold text-slate-900 dark:text-white">Hafta değiştir</p>
+                <p class="mt-1 text-sm text-slate-600 dark:text-slate-300">Sağ/sol oklarla haftalar arasında geç.</p>
             </div>
         </div>
     </div>
 </section>
 
-<!-- MENÜ KARTLARI -->
-<main class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-10 pb-14">
-    @if (Model != null && Model.Any())
-    {
-        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
-            @foreach (var menu in Model)
-            {
-                var isToday = string.Equals(menu.Gun?.Trim(), todayTr, StringComparison.OrdinalIgnoreCase);
+@if (Model != null && Model.Any())
+{
+    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5 pb-6">
+        @foreach (var menu in Model)
+        {
+            var isToday = string.Equals(menu.Gun?.Trim(), todayTr, StringComparison.OrdinalIgnoreCase);
 
-                <article class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 hover:shadow-md transition">
-                    <div class="flex items-start justify-between gap-4">
-                        <div>
-                            <h3 class="text-2xl font-black text-gray-900">
-                                @menu.Gun
-                            </h3>
-                            <p class="mt-1 text-sm text-gray-500">Günün menüsü</p>
-                        </div>
+            <article class="bg-white dark:bg-card-dark rounded-2xl border border-slate-100 dark:border-slate-700 shadow-sm p-6 hover:shadow-md transition">
+                <div class="flex items-start justify-between gap-4">
+                    <div>
+                        <h3 class="text-2xl font-black text-slate-900 dark:text-white">@menu.Gun</h3>
+                        <p class="mt-1 text-sm text-slate-500">Günün menüsü</p>
+                    </div>
 
-                        <div class="flex items-center gap-2">
-                            @if (isToday)
-                            {
-                                <span class="text-xs font-bold px-3 py-1 rounded-full bg-orange-100 text-orange-700">
-                                    Bugün
-                                </span>
-                            }
-                            <span class="text-xs font-semibold px-3 py-1 rounded-full bg-gray-100 text-gray-700">
-                                Menü
+                    <div class="flex items-center gap-2">
+                        @if (isToday)
+                        {
+                            <span class="text-xs font-bold px-3 py-1 rounded-full bg-orange-100 text-orange-700">
+                                Bugün
                             </span>
-                        </div>
-                    </div>
-
-                    <div class="mt-5 space-y-3">
-                        @if (!string.IsNullOrWhiteSpace(menu.Corba))
-                        {
-                            <div class="flex gap-3">
-                                <span class="material-symbols-outlined text-gray-400">soup_kitchen</span>
-                                <div>
-                                    <p class="text-xs text-gray-500">Çorba</p>
-                                    <p class="font-semibold text-gray-900">@menu.Corba</p>
-                                </div>
-                            </div>
                         }
+                        <span class="text-xs font-semibold px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-700/50 text-slate-700 dark:text-slate-200">
+                            Menü
+                        </span>
+                    </div>
+                </div>
 
+                <div class="mt-5 space-y-3">
+                    @if (!string.IsNullOrWhiteSpace(menu.Corba))
+                    {
                         <div class="flex gap-3">
-                            <span class="material-symbols-outlined text-gray-400">dinner_dining</span>
+                            <span class="material-symbols-rounded text-slate-400">soup_kitchen</span>
                             <div>
-                                <p class="text-xs text-gray-500">Ana Yemek</p>
-                                <p class="font-semibold text-gray-900">@menu.AnaYemek</p>
+                                <p class="text-xs text-slate-500">Çorba</p>
+                                <p class="font-semibold text-slate-900 dark:text-white">@menu.Corba</p>
                             </div>
                         </div>
+                    }
 
-                        @if (!string.IsNullOrWhiteSpace(menu.YardimciYemek))
-                        {
-                            <div class="flex gap-3">
-                                <span class="material-symbols-outlined text-gray-400">restaurant</span>
-                                <div>
-                                    <p class="text-xs text-gray-500">Yardımcı</p>
-                                    <p class="font-semibold text-gray-900">@menu.YardimciYemek</p>
-                                </div>
-                            </div>
-                        }
-
-                        @if (!string.IsNullOrWhiteSpace(menu.TatliVeyaMeyve))
-                        {
-                            <div class="flex gap-3">
-                                <span class="material-symbols-outlined text-gray-400">icecream</span>
-                                <div>
-                                    <p class="text-xs text-gray-500">Tatlı / Meyve</p>
-                                    <p class="font-semibold text-gray-900">@menu.TatliVeyaMeyve</p>
-                                </div>
-                            </div>
-                        }
-                    </div>
-                    <div class="mt-6 pt-4 border-t border-gray-100">
-                        <p class="text-sm text-gray-500 text-center">
-                            Afiyet olsun 🍽️
-                        </p>
+                    <div class="flex gap-3">
+                        <span class="material-symbols-rounded text-slate-400">dinner_dining</span>
+                        <div>
+                            <p class="text-xs text-slate-500">Ana Yemek</p>
+                            <p class="font-semibold text-slate-900 dark:text-white">@menu.AnaYemek</p>
+                        </div>
                     </div>
 
-                </article>
-            }
-        </div>
-    }
-    else
-    {
-        <div class="bg-white rounded-2xl border border-gray-100 p-10 text-center text-gray-600">
-            Bu hafta için menü bulunamadı.
-        </div>
-    }
-</main>
+                    @if (!string.IsNullOrWhiteSpace(menu.YardimciYemek))
+                    {
+                        <div class="flex gap-3">
+                            <span class="material-symbols-rounded text-slate-400">restaurant</span>
+                            <div>
+                                <p class="text-xs text-slate-500">Yardımcı</p>
+                                <p class="font-semibold text-slate-900 dark:text-white">@menu.YardimciYemek</p>
+                            </div>
+                        </div>
+                    }
+
+                    @if (!string.IsNullOrWhiteSpace(menu.TatliVeyaMeyve))
+                    {
+                        <div class="flex gap-3">
+                            <span class="material-symbols-rounded text-slate-400">icecream</span>
+                            <div>
+                                <p class="text-xs text-slate-500">Tatlı / Meyve</p>
+                                <p class="font-semibold text-slate-900 dark:text-white">@menu.TatliVeyaMeyve</p>
+                            </div>
+                        </div>
+                    }
+                </div>
+
+                <div class="mt-6 pt-4 border-t border-slate-100 dark:border-slate-700">
+                    <p class="text-sm text-slate-500 text-center">Afiyet olsun 🍽️</p>
+                </div>
+            </article>
+        }
+    </div>
+}
+else
+{
+    <div class="bg-white dark:bg-card-dark rounded-2xl border border-slate-100 dark:border-slate-700 p-10 text-center text-slate-600 dark:text-slate-300">
+        Bu hafta için menü bulunamadı.
+    </div>
+}

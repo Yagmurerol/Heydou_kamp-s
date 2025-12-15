@@ -12,7 +12,6 @@
     // pazartesiyle başlasın
     int padding = ((int)firstDay.DayOfWeek + 6) % 7;
 
-    // bu ayla kesişen etkinlikler zaten controllerdan geliyor
     var monthEvents = Model ?? new List<hey.dou.Models.AkademikTakvim>();
 
     string MonthNameTr(int m)
@@ -21,7 +20,6 @@
         return names[m - 1];
     }
 
-    // veri tabanında renk varsa onu kullan, yoksa kategoriye göre üret
     string GetColor(hey.dou.Models.AkademikTakvim ev)
     {
         if (!string.IsNullOrWhiteSpace(ev.RenkKodu))
@@ -36,142 +34,136 @@
         return "#94a3b8";
     }
 
-    // ok linkleri
     string prevUrl = Url.Action("Index", "AkademikTakvim", new { year = (int)ViewBag.PrevYear, month = (int)ViewBag.PrevMonth })!;
     string nextUrl = Url.Action("Index", "AkademikTakvim", new { year = (int)ViewBag.NextYear, month = (int)ViewBag.NextMonth })!;
 }
 
-<!-- ✅ Layout uyumlu wrapper (body yok) -->
-<div class="px-6 sm:px-10 lg:px-20 py-8">
-    <!-- başlık ve yazdır -->
-    <div class="flex items-center justify-between mb-6">
-        <div>
-            <h2 class="text-3xl md:text-4xl font-extrabold">Akademik Takvim</h2>
-            <p class="text-sm text-slate-500 mt-1">Sınav, tatil ve kayıt dönemlerini buradan takip edebilirsin.</p>
+<div class="flex items-center justify-between mb-6">
+    <div>
+        <h2 class="text-3xl md:text-4xl font-extrabold">Akademik Takvim</h2>
+        <p class="text-sm text-slate-500 mt-1">Sınav, tatil ve kayıt dönemlerini buradan takip edebilirsin.</p>
+    </div>
+
+    <button type="button"
+            onclick="window.print()"
+            class="inline-flex items-center gap-2 rounded-xl border border-slate-200 dark:border-slate-700 px-4 py-2 text-sm hover:bg-slate-50 dark:hover:bg-slate-800/40">
+        <span class="material-symbols-rounded text-base">print</span>
+        Yazdır
+    </button>
+</div>
+
+<div class="flex flex-col lg:flex-row gap-6">
+    <!-- SOL PANEL -->
+    <aside class="w-full lg:w-1/4 xl:w-1/5 space-y-6">
+        <div class="bg-white dark:bg-card-dark p-4 rounded-2xl border border-slate-100 dark:border-slate-700 shadow-sm">
+            <p class="text-sm font-semibold mb-3">Filtrele</p>
+            <div class="space-y-2 text-sm">
+                <label class="flex items-center gap-2">
+                    <input type="radio" name="takvimFilter" value="ALL" checked />
+                    <span>Tümü</span>
+                </label>
+                <label class="flex items-center gap-2">
+                    <input type="radio" name="takvimFilter" value="Sınav" />
+                    <span>Sınavlar</span>
+                </label>
+                <label class="flex items-center gap-2">
+                    <input type="radio" name="takvimFilter" value="Tatil" />
+                    <span>Tatiller</span>
+                </label>
+                <label class="flex items-center gap-2">
+                    <input type="radio" name="takvimFilter" value="Kayıt" />
+                    <span>Kayıt Dönemleri</span>
+                </label>
+            </div>
         </div>
 
-        <button type="button"
-                onclick="window.print()"
-                class="inline-flex items-center gap-2 rounded-xl border border-slate-200 px-4 py-2 text-sm hover:bg-slate-50">
-            <span class="material-symbols-outlined text-base">print</span>
-            Yazdır
-        </button>
-    </div>
+        <div class="bg-white dark:bg-card-dark p-4 rounded-2xl border border-slate-100 dark:border-slate-700 shadow-sm">
+            <p class="text-sm font-semibold mb-3">Renk Kodu</p>
+            <ul class="space-y-2 text-sm">
+                <li class="flex items-center gap-2">
+                    <span class="h-3 w-3 rounded-full bg-[#f59e0b]"></span> Sınavlar
+                </li>
+                <li class="flex items-center gap-2">
+                    <span class="h-3 w-3 rounded-full bg-[#10b981]"></span> Tatiller
+                </li>
+                <li class="flex items-center gap-2">
+                    <span class="h-3 w-3 rounded-full bg-[#ef4444]"></span> Kayıt Dönemleri
+                </li>
+            </ul>
+        </div>
+    </aside>
 
-    <div class="flex flex-col lg:flex-row gap-6">
-        <!-- SOL PANEL -->
-        <aside class="w-full lg:w-1/4 xl:w-1/5 space-y-6">
-            <div class="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm">
-                <p class="text-sm font-semibold mb-3">Filtrele</p>
-                <div class="space-y-2 text-sm">
-                    <label class="flex items-center gap-2">
-                        <input type="radio" name="takvimFilter" value="ALL" checked />
-                        <span>Tümü</span>
-                    </label>
-                    <label class="flex items-center gap-2">
-                        <input type="radio" name="takvimFilter" value="Sınav" />
-                        <span>Sınavlar</span>
-                    </label>
-                    <label class="flex items-center gap-2">
-                        <input type="radio" name="takvimFilter" value="Tatil" />
-                        <span>Tatiller</span>
-                    </label>
-                    <label class="flex items-center gap-2">
-                        <input type="radio" name="takvimFilter" value="Kayıt" />
-                        <span>Kayıt Dönemleri</span>
-                    </label>
+    <!-- SAĞ TARAF -->
+    <section class="flex-1 space-y-6">
+        <!-- TAKVİM -->
+        <div class="bg-white dark:bg-card-dark p-6 rounded-2xl border border-slate-100 dark:border-slate-700 shadow-sm">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-lg font-semibold">
+                    @MonthNameTr(currentMonth) @currentYear
+                </h3>
+
+                <div class="flex gap-2">
+                    <a href="@prevUrl"
+                       class="h-9 w-9 rounded-full bg-slate-100 dark:bg-slate-700/50 flex items-center justify-center hover:bg-slate-200 dark:hover:bg-slate-700">
+                        <span class="material-symbols-rounded text-sm">chevron_left</span>
+                    </a>
+                    <a href="@nextUrl"
+                       class="h-9 w-9 rounded-full bg-slate-100 dark:bg-slate-700/50 flex items-center justify-center hover:bg-slate-200 dark:hover:bg-slate-700">
+                        <span class="material-symbols-rounded text-sm">chevron_right</span>
+                    </a>
                 </div>
             </div>
 
-            <div class="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm">
-                <p class="text-sm font-semibold mb-3">Renk Kodu</p>
-                <ul class="space-y-2 text-sm">
-                    <li class="flex items-center gap-2">
-                        <span class="h-3 w-3 rounded-full bg-[#f59e0b]"></span> Sınavlar
-                    </li>
-                    <li class="flex items-center gap-2">
-                        <span class="h-3 w-3 rounded-full bg-[#10b981]"></span> Tatiller
-                    </li>
-                    <li class="flex items-center gap-2">
-                        <span class="h-3 w-3 rounded-full bg-[#ef4444]"></span> Kayıt Dönemleri
-                    </li>
-                </ul>
-            </div>
-        </aside>
-
-        <!-- SAĞ TARAF -->
-        <section class="flex-1 space-y-6">
-            <!-- TAKVİM -->
-            <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
-                <div class="flex items-center justify-between mb-6">
-                    <h3 class="text-lg font-semibold">
-                        @MonthNameTr(currentMonth) @currentYear
-                    </h3>
-
-                    <div class="flex gap-2">
-                        <a href="@prevUrl"
-                           class="h-9 w-9 rounded-full bg-slate-100 flex items-center justify-center hover:bg-slate-200">
-                            <span class="material-symbols-outlined text-sm">chevron_left</span>
-                        </a>
-                        <a href="@nextUrl"
-                           class="h-9 w-9 rounded-full bg-slate-100 flex items-center justify-center hover:bg-slate-200">
-                            <span class="material-symbols-outlined text-sm">chevron_right</span>
-                        </a>
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-7 gap-2 text-center text-xs font-semibold text-slate-400 mb-2">
-                    <div>Pzt</div><div>Sal</div><div>Çar</div><div>Per</div><div>Cum</div><div>Cmt</div><div>Paz</div>
-                </div>
-
-                <div class="grid grid-cols-7 gap-2 text-center">
-                    @for (int i = 0; i < padding; i++)
-                    {
-                        <div class="h-16 rounded-xl"></div>
-                    }
-
-                    @for (int day = 1; day <= daysInMonth; day++)
-                    {
-                        var dayDate = new DateOnly(currentYear, currentMonth, day);
-
-                        // ✅ Seçilen günü kapsayan event noktaları (çok günlük dahil)
-                        var eventsOfDay = monthEvents
-                        .Where(e => e.BaslangicTarihi <= dayDate && e.BitisTarihi >= dayDate)
-                        .ToList();
-
-                        bool isToday = (day == today.Day && currentMonth == today.Month && currentYear == today.Year);
-
-                        <button type="button"
-                                data-date="@dayDate.ToString("yyyy-MM-dd")"
-                                class="day-cell h-16 w-full rounded-xl border border-slate-100 bg-slate-50/40 flex flex-col items-center py-1 gap-1 hover:bg-slate-100/60 transition @(isToday ? "ring-2 ring-orange-400" : "")">
-                            <span class="text-sm font-semibold @(isToday ? "text-orange-600" : "text-slate-700")">
-                                @day
-                            </span>
-
-                            <div class="flex gap-1 flex-wrap justify-center">
-                                @foreach (var ev in eventsOfDay.Take(3))
-                                {
-                                    var c = GetColor(ev);
-                                    <span class="h-2 w-2 rounded-full" style="background-color:@c"></span>
-                                }
-                            </div>
-                        </button>
-                    }
-                </div>
+            <div class="grid grid-cols-7 gap-2 text-center text-xs font-semibold text-slate-400 mb-2">
+                <div>Pzt</div><div>Sal</div><div>Çar</div><div>Per</div><div>Cum</div><div>Cmt</div><div>Paz</div>
             </div>
 
-            <!-- SEÇİLEN GÜN PANELİ -->
-            <div class="bg-white rounded-2xl border border-slate-100 shadow-sm">
-                <div class="flex items-center justify-between px-6 py-4 border-b border-slate-100">
-                    <p class="font-semibold text-sm">Seçilen Gün Etkinlikleri</p>
-                </div>
+            <div class="grid grid-cols-7 gap-2 text-center">
+                @for (int i = 0; i < padding; i++)
+                {
+                    <div class="h-16 rounded-xl"></div>
+                }
 
-                <div id="eventsPanel" class="p-6 space-y-3">
-                    <p class="text-sm text-slate-400">Bir gün seç.</p>
-                </div>
+                @for (int day = 1; day <= daysInMonth; day++)
+                {
+                    var dayDate = new DateOnly(currentYear, currentMonth, day);
+
+                    var eventsOfDay = monthEvents
+                    .Where(e => e.BaslangicTarihi <= dayDate && e.BitisTarihi >= dayDate)
+                    .ToList();
+
+                    bool isToday = (day == today.Day && currentMonth == today.Month && currentYear == today.Year);
+
+                    <button type="button"
+                            data-date="@dayDate.ToString("yyyy-MM-dd")"
+                            class="day-cell h-16 w-full rounded-xl border border-slate-100 dark:border-slate-700 bg-slate-50/40 dark:bg-slate-900/30 flex flex-col items-center py-1 gap-1 hover:bg-slate-100/60 dark:hover:bg-slate-800/40 transition @(isToday ? "ring-2 ring-orange-400" : "")">
+                        <span class="text-sm font-semibold @(isToday ? "text-orange-600" : "text-slate-700 dark:text-slate-200")">
+                            @day
+                        </span>
+
+                        <div class="flex gap-1 flex-wrap justify-center">
+                            @foreach (var ev in eventsOfDay.Take(3))
+                            {
+                                var c = GetColor(ev);
+                                <span class="h-2 w-2 rounded-full" style="background-color:@c"></span>
+                            }
+                        </div>
+                    </button>
+                }
             </div>
-        </section>
-    </div>
+        </div>
+
+        <!-- SEÇİLEN GÜN PANELİ -->
+        <div class="bg-white dark:bg-card-dark rounded-2xl border border-slate-100 dark:border-slate-700 shadow-sm">
+            <div class="flex items-center justify-between px-6 py-4 border-b border-slate-100 dark:border-slate-700">
+                <p class="font-semibold text-sm">Seçilen Gün Etkinlikleri</p>
+            </div>
+
+            <div id="eventsPanel" class="p-6 space-y-3">
+                <p class="text-sm text-slate-400">Bir gün seç.</p>
+            </div>
+        </div>
+    </section>
 </div>
 
 @section Scripts {
@@ -198,11 +190,8 @@
                 const res = await fetch(`/AkademikTakvim/GetEventsByDate?date=${encodeURIComponent(date)}`);
                 let html = await res.text();
 
-                // ✅ Basit filtre: paneldeki metin içinde kategori yoksa gizleme mantığı
-                // (Backend HTML'inde <p class='font-semibold text-sm'>{ev.Kategori}</p> var)
                 const filter = getSelectedFilter();
                 if (filter !== "ALL") {
-                    // HTML'i DOM'a çevirip filtrele
                     const temp = document.createElement("div");
                     temp.innerHTML = html;
 
@@ -223,11 +212,8 @@
             }
         }
 
-        cells.forEach(btn => {
-            btn.addEventListener("click", () => loadEvents(btn.dataset.date, btn));
-        });
+        cells.forEach(btn => btn.addEventListener("click", () => loadEvents(btn.dataset.date, btn)));
 
-        // Filtre değişince seçili günü yeniden yükle
         filterRadios.forEach(r => {
             r.addEventListener("change", () => {
                 const selected = document.querySelector(".day-cell.ring-2");
@@ -235,8 +221,7 @@
             });
         });
 
-        // Sayfa açılınca bugünü seç
-        const todayStr = new Date().toISOString().slice(0,10);
+        const todayStr = new Date().toISOString().slice(0, 10);
         const todayCell = [...cells].find(x => x.dataset.date === todayStr);
         if (todayCell) todayCell.click();
     </script>
