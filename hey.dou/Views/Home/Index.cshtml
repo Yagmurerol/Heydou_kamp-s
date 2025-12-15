@@ -1,11 +1,12 @@
 ﻿@using Microsoft.AspNetCore.Http
 @inject IHttpContextAccessor HttpContextAccessor
 @{
-    Layout = null; // Kendi özel layout'unu kullanıyor
+    Layout = null;
 
-    // Session'dan kullanıcı bilgilerini al
-    string adSoyad = HttpContextAccessor.HttpContext.Session.GetString("AdSoyad") ?? "Misafir";
-    string rol = HttpContextAccessor.HttpContext.Session.GetString("Rol") ?? "Ogrenci";
+    // DÜZELTME: HttpContext'ten sonra ? koyduk. Session'dan sonra ? koyduk.
+    // Bu sayede "Nesne yoksa hata verme, null geç" diyoruz.
+    string adSoyad = HttpContextAccessor.HttpContext?.Session?.GetString("AdSoyad") ?? "Misafir";
+    string rol = HttpContextAccessor.HttpContext?.Session?.GetString("Rol") ?? "Ogrenci";
 
     string bugun = DateTime.Now.ToString("dd MMMM yyyy, dddd", new System.Globalization.CultureInfo("tr-TR"));
 }
@@ -107,6 +108,12 @@
                    href="/Anket/Index">
                     <span class="material-symbols-rounded">poll</span>
                     Anketler
+                </a>
+
+                <a class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-700/50 hover:text-slate-900 dark:hover:text-slate-100 transition-colors"
+                   href="/Kroki/Index">
+                    <span class="material-symbols-rounded">map</span>
+                    Kampüs Krokisi
                 </a>
 
                 <a class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-700/50 hover:text-slate-900 dark:hover:text-slate-100 transition-colors"
@@ -258,17 +265,21 @@
                             <p class="text-slate-500 dark:text-slate-400 text-sm mb-6 max-w-2xl mx-auto md:mx-0">
                                 Kampüs haritası üzerinden aradığın konuma hızlıca ulaş. Derslikler, fakülteler veya sosyal alanlar için arama yapabilirsin.
                             </p>
-                            <div class="relative max-w-2xl mx-auto md:mx-0 mb-4 group-focus-within:ring-2 ring-primary/20 rounded-xl transition-all">
+
+                            <form action="/Kroki/Index" method="get" class="relative max-w-2xl mx-auto md:mx-0 mb-4 group-focus-within:ring-2 ring-primary/20 rounded-xl transition-all">
                                 <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                                     <span class="material-symbols-rounded text-slate-400">search</span>
                                 </div>
-                                <input class="block w-full pl-11 pr-24 py-4 border-slate-200 dark:border-slate-700 rounded-xl bg-slate-50 dark:bg-slate-900/50 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-primary focus:ring-0 transition-colors shadow-sm text-sm md:text-base" placeholder="Bina, derslik veya bir yerleşke ara..." type="text" />
+                                <input type="text" name="kod"
+                                       class="block w-full pl-11 pr-24 py-4 border-slate-200 dark:border-slate-700 rounded-xl bg-slate-50 dark:bg-slate-900/50 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-primary focus:ring-0 transition-colors shadow-sm text-sm md:text-base"
+                                       placeholder="Bina, derslik veya bir yerleşke ara (Örn: B2-01)..." />
                                 <div class="absolute inset-y-2 right-2">
-                                    <button class="h-full px-5 bg-primary hover:bg-primary-dark text-white rounded-lg text-sm font-semibold transition-colors shadow-sm flex items-center gap-1">
+                                    <button type="submit" class="h-full px-5 bg-primary hover:bg-primary-dark text-white rounded-lg text-sm font-semibold transition-colors shadow-sm flex items-center gap-1">
                                         Git <span class="material-symbols-rounded text-sm">arrow_forward</span>
                                     </button>
                                 </div>
-                            </div>
+                            </form>
+
                         </div>
                     </div>
                 </div>

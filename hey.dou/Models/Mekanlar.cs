@@ -7,11 +7,13 @@ public partial class Mekanlar
 {
     public int MekanId { get; set; }
 
+    // DÜZELTME: = null!; eklendi
     public string MekanKodu { get; set; } = null!;
 
     public string? Aciklama { get; set; }
 
     public int KatId { get; set; }
 
+    // DÜZELTME: = null!; eklendi
     public virtual Katlar Kat { get; set; } = null!;
 }
