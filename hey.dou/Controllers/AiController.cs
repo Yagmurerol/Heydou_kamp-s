@@ -9,15 +9,14 @@ namespace hey.dou.Controllers
     {
         private readonly IAiDanismanService _aiService;
 
-        public AiDanismanController(IAiDanismanService aiService)
+        public AiDanismanController(IAiDanismanService aiService) // Yapay zeka servisini başlatır
         {
             _aiService = aiService;
         }
 
         [HttpGet]
-        public IActionResult Index()
+        public IActionResult Index() // AI Danışman sayfasını görüntüler ve oturum kontrolü yapar
         {
-            // GİRİŞ ZORUNLU OLSUN İSTEMİYORSAN BU BLOĞU SİLEBİLİRSİN
             if (HttpContext.Session.GetInt32("UserId") == null)
             {
                 return RedirectToAction("Login", "Account");
@@ -28,7 +27,7 @@ namespace hey.dou.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Index(AiDanismanViewModel model)
+        public async Task<IActionResult> Index(AiDanismanViewModel model) // Kullanıcının sorusunu alır ve AI servisinden cevap döndürür
         {
             if (HttpContext.Session.GetInt32("UserId") == null)
             {

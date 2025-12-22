@@ -8,12 +8,12 @@ namespace hey.dou.Controllers
     {
         private readonly HeydouContext _context;
 
-        public AkademikTakvimController(HeydouContext context)
+        public AkademikTakvimController(HeydouContext context) // Veritabanı bağlamını başlatır
         {
             _context = context;
         }
 
-        public async Task<IActionResult> Index(int? year, int? month)
+        public async Task<IActionResult> Index(int? year, int? month) // Takvim ana sayfasını oluşturur ve aylık etkinlikleri listeler
         {
             var today = DateTime.Today;
             int currentYear = year ?? today.Year;
@@ -32,7 +32,6 @@ namespace hey.dou.Controllers
             ViewBag.NextYear = next.Year;
             ViewBag.NextMonth = next.Month;
 
-            // ✅ Bu ayla kesişen tüm etkinlikler (çok günlük dahil)
             var events = await _context.AkademikTakvims
                 .Where(e =>
                     e.BaslangicTarihi <= DateOnly.FromDateTime(lastDay) &&
@@ -44,14 +43,13 @@ namespace hey.dou.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetEventsByDate(string date)
+        public async Task<IActionResult> GetEventsByDate(string date) // Seçilen tarihe özel etkinlikleri dinamik HTML olarak döndürür
         {
             if (!DateOnly.TryParse(date, out var selectedDate))
                 return Content("<p class='text-red-500 text-sm'>Geçersiz tarih.</p>", "text/html");
 
             var today = DateOnly.FromDateTime(DateTime.Today);
 
-            // ✅ Seçilen günü kapsayan etkinlikler (aralık kontrolü)
             var events = await _context.AkademikTakvims
                 .Where(e => e.BaslangicTarihi <= selectedDate && e.BitisTarihi >= selectedDate)
                 .OrderBy(e => e.BaslangicTarihi)
@@ -59,7 +57,6 @@ namespace hey.dou.Controllers
 
             if (!events.Any())
             {
-                // Yaklaşan 5 etkinlik (fallback)
                 events = await _context.AkademikTakvims
                     .Where(e => e.BaslangicTarihi >= today)
                     .OrderBy(e => e.BaslangicTarihi)

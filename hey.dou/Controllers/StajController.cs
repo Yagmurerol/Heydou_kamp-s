@@ -6,32 +6,26 @@ using System.Threading.Tasks;
 
 namespace hey.dou.Controllers
 {
-    // Artık normal MVC controller
     public class StajController : Controller
     {
         private readonly HeydouContext _context;
 
-        public StajController(HeydouContext context)
+        public StajController(HeydouContext context) // Veritabanı bağlamını başlatır
         {
             _context = context;
         }
 
-        // /Staj veya /Staj/Index → View
         [HttpGet]
-        public IActionResult Index()
+        public IActionResult Index() // Staj ilanlarının gösterileceği ana sayfa arayüzünü döner
         {
             return View();
         }
 
-        // /api/Staj/Listele → JSON (frontend buraya istek atıyor)
         [HttpGet("api/Staj/Listele")]
-        public async Task<IActionResult> Listele()
+        public async Task<IActionResult> Listele() // Aktif staj ilanlarını veritabanından çekerek JSON formatında listeler
         {
-            // Önce tüm kayıtları al (debug için filtreyi hafif tuttum)
             var sorgu = _context.StajIlanlaris.AsQueryable();
 
-            // Aktif kolonun 1 olduğu (true) ilanlar gelsin,
-            // ama null ise de göster (hocanın eklediği datalar kaçmasın diye)
             sorgu = sorgu.Where(i => i.Aktif == null || i.Aktif == true);
 
             var ilanlar = await sorgu
