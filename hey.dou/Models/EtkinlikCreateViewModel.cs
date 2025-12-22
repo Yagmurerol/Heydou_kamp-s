@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace hey.dou.Models
 {
-    // Bu, Create formundan gelen tüm veriyi tutan kalıptır.
+   
     public class EtkinlikCreateViewModel
     {
         [Required(ErrorMessage = "Kulüp Adı zorunludur.")]

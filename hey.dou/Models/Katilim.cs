@@ -6,8 +6,7 @@ namespace hey.dou.Models;
 public class Katilim
 {
 	[Key]
-	// Veritabanında da adı 'KatilimId' olduğu için ekstra bir ayara gerek yok.
-	// EF Core otomatik olarak bu sütunla eşleşecektir.
+
 	public int KatilimId { get; set; }
 
 	public int EtkinlikId { get; set; }

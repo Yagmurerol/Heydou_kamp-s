@@ -18,7 +18,7 @@ builder.Services.AddHttpContextAccessor();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// ✅ 4. AI Danışman Servisi (DI için ŞART)
+// ✅ 4. AI Danışman Servisi 
 builder.Services.AddScoped<IAiDanismanService, AiDanismanService>();
 
 var app = builder.Build();
