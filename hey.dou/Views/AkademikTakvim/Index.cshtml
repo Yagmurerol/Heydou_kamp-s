@@ -34,7 +34,7 @@
         return "#94a3b8";
     }
 
-    string prevUrl = Url.Action("Index", "AkademikTakvim", new { year = (int)ViewBag.PrevYear, month = (int)ViewBag.PrevMonth })!;
+    string prevUrl = Url.Action("Index", "AkademikTakvim", new { year = (int)ViewBag.PreviousYear, month = (int)ViewBag.PreviousMonth })!;
     string nextUrl = Url.Action("Index", "AkademikTakvim", new { year = (int)ViewBag.NextYear, month = (int)ViewBag.NextMonth })!;
 }
 

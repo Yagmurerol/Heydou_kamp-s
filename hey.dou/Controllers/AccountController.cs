@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using hey.dou.Models;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
+using BCrypt.Net;
 
 namespace hey.dou.Controllers
 {
@@ -32,10 +33,27 @@ namespace hey.dou.Controllers
 
             var kullanici = await _context.Kullanicilars.FirstOrDefaultAsync(k =>
                 k.Email == email &&
-                k.Sifre == password &&
                 (k.Rol == "Ogrenci" || k.Rol == "KulupBaskani"));
 
             if (kullanici == null)
+            {
+                ViewBag.Error = "E-posta, şifre hatalı veya yetkiniz yok.";
+                return View("Login");
+            }
+
+            // Şifre doğrulama - BCrypt ve plain text desteği
+            bool isPasswordValid = false;
+            try
+            {
+                isPasswordValid = BCrypt.Net.BCrypt.Verify(password, kullanici.Sifre);
+            }
+            catch
+            {
+                // Eski plain text şifreler veya BCrypt formatında olmayan şifreler için fallback
+                isPasswordValid = (password == kullanici.Sifre);
+            }
+
+            if (!isPasswordValid)
             {
                 ViewBag.Error = "E-posta, şifre hatalı veya yetkiniz yok.";
                 return View("Login");
@@ -60,10 +78,27 @@ namespace hey.dou.Controllers
 
             var kullanici = await _context.Kullanicilars.FirstOrDefaultAsync(k =>
                 k.Email == email &&
-                k.Sifre == password &&
                 (k.Rol != "Ogrenci" && k.Rol != "KulupBaskani"));
 
             if (kullanici == null)
+            {
+                ViewBag.Error = "E-posta veya şifre hatalı.";
+                return View("Login");
+            }
+
+            // Şifre doğrulama - BCrypt ve plain text desteği
+            bool isPasswordValid = false;
+            try
+            {
+                isPasswordValid = BCrypt.Net.BCrypt.Verify(password, kullanici.Sifre);
+            }
+            catch
+            {
+                // Eski plain text şifreler veya BCrypt formatında olmayan şifreler için fallback
+                isPasswordValid = (password == kullanici.Sifre);
+            }
+
+            if (!isPasswordValid)
             {
                 ViewBag.Error = "E-posta veya şifre hatalı.";
                 return View("Login");
