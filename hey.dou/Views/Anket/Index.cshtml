@@ -3,7 +3,30 @@
 @model IEnumerable<hey.dou.Models.Anket>
 
 @{
-    ViewData["Title"] = "Aktif Etkinlik Oylamaları";
+    // 1. DİNAMİK TARİH HESAPLAMA BLOĞU
+    DateTime bugun = DateTime.Today;
+    int fark = (7 + (bugun.DayOfWeek - DayOfWeek.Monday)) % 7;
+    DateTime pazartesi = bugun.AddDays(-1 * fark);
+    DateTime pazar = pazartesi.AddDays(6);
+
+    var kultur = new System.Globalization.CultureInfo("tr-TR");
+    string ayPazartesi = pazartesi.ToString("MMMM", kultur);
+    string ayPazar = pazar.ToString("MMMM", kultur);
+
+    string tarihAraligi = "";
+    if (pazartesi.Month == pazar.Month)
+    {
+        tarihAraligi = $"{pazartesi.Day}-{pazar.Day} {ayPazartesi}";
+    }
+    else
+    {
+        tarihAraligi = $"{pazartesi.Day} {ayPazartesi} - {pazar.Day} {ayPazar}";
+    }
+
+    string dinamikBaslik = $"({tarihAraligi}) Etkinlik Oylaması";
+
+    // 2. SAYFA BAŞLIĞINI DİNAMİK YAPIYORUZ
+    ViewData["Title"] = dinamikBaslik;
 }
 
 <div class="px-4 sm:px-10 lg:px-40 py-8">
@@ -13,13 +36,15 @@
             <p class="text-gray-500 dark:text-gray-300 mt-2">Aşağıdaki aktif oylamalara katılabilirsiniz.</p>
         </div>
 
-        @if (HttpContextAccessor.HttpContext.Session.GetString("Rol") == "KulupBaskani")
+        @if (HttpContextAccessor.HttpContext?.Session?.GetString("Rol") == "KulupBaskani")
         {
-            <a asp-action="Create"
-               class="flex items-center gap-2 bg-primary hover:bg-red-500 text-white px-6 py-3 rounded-xl font-bold transition-transform transform hover:scale-105 shadow-lg">
-                <span class="material-symbols-outlined">add_circle</span>
-                Yeni Etkinlik Oylaması Başlat
-            </a>
+            <div class="flex items-center gap-4">
+                <a asp-action="Create"
+                   class="flex items-center gap-2 bg-primary hover:bg-red-500 text-white px-6 py-3 rounded-xl font-bold transition-transform transform hover:scale-105 shadow-lg">
+                    <span class="material-symbols-outlined">add_circle</span>
+                    Yeni Etkinlik Oylaması Başlat
+                </a>
+            </div>
         }
     </div>
 
@@ -62,8 +87,8 @@
                         </span>
                     </div>
 
-                    <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2 line-clamp-2" title="@anket.Title">
-                        @anket.Title
+                    <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2 line-clamp-2" title="@dinamikBaslik">
+                        @dinamikBaslik
                     </h3>
 
                     <p class="text-gray-500 dark:text-gray-400 text-sm mb-6 line-clamp-3 flex-grow">
